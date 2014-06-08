@@ -11,12 +11,18 @@ public class BdmProtocol
 {
   public static final String PROTOCOL_MARKER = "Protocol";
 
+  public final BdmStringAttribute m_copyrightNotice;
   public final BdmStringAttribute m_name;
+  public final BdmStringAttribute m_frameTypeContainer;
+
   public final List<BdmFrame>     frames;
 
-  public BdmProtocol() throws BdmException //TODO !!
+  public BdmProtocol() throws BdmException
   {
-    m_name = new BdmStringAttribute("name", false, false, "", null, null);
+    m_copyrightNotice    = new BdmStringAttribute("copyrightNotice",    true,  true,  null, null, null);
+    m_name               = new BdmStringAttribute("name",               false, false, "",   null, null);
+    m_frameTypeContainer = new BdmStringAttribute("frameTypeContainer", false, true,  "u8", null, null);
+
     frames = new ArrayList<BdmFrame>();
   }
 

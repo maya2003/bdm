@@ -196,28 +196,42 @@ public class BdmFrameGenerator
              "    }\n\n");
   }
 
-  public void appendCheckFieldsBounds(StringBuilder s)
+  public void appendFrameCheckContentDeclaration(StringBuilder s)
+  {
+    m_bdmMethodGenerator.appendMethodDeclaration(s);
+  }
+
+  public void appendCheckFrameContent(StringBuilder s)
   {
     m_bdmMethodGenerator.appendMethodDefinition(s);
     s.append("{\n");
-    
-    s.append("  /* Suppose the frame to be valid */\n");
-    s.append("  bool valid = true;\n\n");
+
+    s.append("  /* Suppose the frame to be valid */\n" +
+             "  bool valid = true;\n\n");
+
+    appendCheckFieldsBounds(s);
+    appendCheckSpares(s);
+
+    s.append("  /* Copy frame fields to BDM fields */\n" +
+             "  if(valid)\n" +
+             "  {\n");
+    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+    {
+      s.append("// copy " + bdmFieldGenerator.m_fullName + " to destination\n");
+    }
+    s.append("  }\n");
+
+    s.append("}\n\n");
+  }
+
+  public void appendCheckFieldsBounds(StringBuilder s)
+  {
+    s.append("      /* Check values of fields */\n");
 
     for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
     {
       bdmFieldGenerator.appendCheckFieldsBounds(s);
     }
-
-    s.append("  /* Copy frame fields to BDM fields */\n");
-    s.append("  if(valid)\n");
-    s.append("  {\n");
-    for(@SuppressWarnings("unused") BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
-    {
-    }
-    s.append("  }\n");
-  
-    s.append("}\n\n");    
   }
 
   public void appendCheckSpares(StringBuilder s)

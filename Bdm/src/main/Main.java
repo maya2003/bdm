@@ -11,10 +11,8 @@ import java.io.Writer;
 import unoParser.BdmCell;
 import unoParser.BdmProtocolParser;
 
-import bdmGenerator.BdmFieldGenerator;
-import bdmGenerator.BdmFrameGenerator;
+import bdmModel.BdmProtocol;
 
-import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.sheet.XSpreadsheet;
 import com.sun.star.sheet.XSpreadsheetDocument;
 import com.sun.star.sheet.XSpreadsheets;
@@ -29,60 +27,70 @@ public class Main
 {
   public static void main(String[] args) throws Exception
   {
-    XComponentContext xContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
-    System.out.println("Connected to LibreOffice...");
+    System.out.println("Connecting to LibreOffice...");
+    XComponentContext xComponentContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
+    Object desktopFrame = xComponentContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
+    XComponentLoader xComponentLoader = (XComponentLoader)UnoRuntime.queryInterface(XComponentLoader.class, desktopFrame);
 
-    XMultiComponentFactory multiComponentFactory = xContext.getServiceManager();
-    Object desktopFrame = multiComponentFactory.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
-    XComponentLoader componentloader = (XComponentLoader)UnoRuntime.queryInterface(XComponentLoader.class, desktopFrame);
-
-    XSpreadsheetDocument spreadsheet = null;
-
-    String specificationPath = "file://" + System.getProperty("user.dir") + "/Specification/Specification.ods";
-    String outFilePath = System.getProperty("user.dir") + "/Generated sources/protocol.c";
-    System.out.println(specificationPath);
-    System.out.println(outFilePath);
-
-    /* Load the spreadsheet */
-    try
-    {
-      Object component = componentloader.loadComponentFromURL(specificationPath, "_default", 0, new PropertyValue[0]);
-
-      System.out.println("BDM spreadsheet open...");
-
-      /* Get the active spreadsheet of the component */
-      XModel model = (XModel)UnoRuntime.queryInterface(XModel.class, component);
-      spreadsheet = (XSpreadsheetDocument)UnoRuntime.queryInterface(XSpreadsheetDocument.class, model);
-    } catch(Exception e) {}
+    StringBuilder specificationPath = new StringBuilder("file://").append(System.getProperty("user.dir")).append("/Specification/Specification.ods");
+    System.out.print("Opening specification spreadsheet: ");
+    System.out.print(specificationPath);
+    System.out.println("...");
 
     try
     {
-      XSpreadsheets xSheets = spreadsheet.getSheets();
-      XIndexAccess oIndexSheets = (XIndexAccess)UnoRuntime.queryInterface(XIndexAccess.class, xSheets);
-      XSpreadsheet xSheet = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, oIndexSheets.getByIndex(1));
+      /* Load the spreadsheet document */
+      Object component = xComponentLoader.loadComponentFromURL(specificationPath.toString(), "_default", 0, new PropertyValue[0]);
+      XModel xModel = (XModel)UnoRuntime.queryInterface(XModel.class, component);
+      XSpreadsheetDocument xSpreadsheetDocument = (XSpreadsheetDocument)UnoRuntime.queryInterface(XSpreadsheetDocument.class, xModel);
 
-      Writer outFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFilePath), "UTF-8"));
+      /* Get the sheet */
+      XSpreadsheets xSpreadsheets = xSpreadsheetDocument.getSheets();
+      XIndexAccess xIndexAccess = (XIndexAccess)UnoRuntime.queryInterface(XIndexAccess.class, xSpreadsheets);
+      XSpreadsheet xSheet = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(1));
 
-      bdmModel.BdmProtocol bdmProtocol = new bdmModel.BdmProtocol();
+      System.out.println("Parsing specification spreadsheet...");
+
+      BdmProtocol bdmProtocol = new bdmModel.BdmProtocol();
       BdmCell bdmCell = new BdmCell(xSheet, 2, 1);
       BdmProtocolParser bdmProtocolParser = new BdmProtocolParser(bdmProtocol, bdmCell);
       bdmProtocolParser.parse();
 
-      StringBuilder s2 = new StringBuilder();
+      System.out.println("Generating protocol and dictionary...");
+
+      StringBuilder protocolHeader           = new StringBuilder(System.getProperty("user.dir")).append("/Generated sources/protocol.h");
+      StringBuilder protocolImplementation   = new StringBuilder(System.getProperty("user.dir")).append("/Generated sources/protocol.c");
+      StringBuilder dictionaryHeader         = new StringBuilder(System.getProperty("user.dir")).append("/Generated sources/dictionary.h");
+      StringBuilder dictionaryImplementation = new StringBuilder(System.getProperty("user.dir")).append("/Generated sources/dictionary.c");
+
+      System.out.print("Protocol header:           ");
+      System.out.println(protocolHeader);
+      System.out.print("Protocol implementation:   ");
+      System.out.println(protocolImplementation);
+      System.out.print("Dictionary header:         ");
+      System.out.println(dictionaryHeader);
+      System.out.print("Dictionary implementation: ");
+      System.out.println(dictionaryImplementation);
+
+      Writer protocolHeaderFile           = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(protocolHeader.toString()),           "UTF-8"));
+      Writer protocolImplementationFile   = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(protocolImplementation.toString()),   "UTF-8"));
+      Writer dictionaryHeaderFile         = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dictionaryHeader.toString()),         "UTF-8"));
+      Writer dictionaryImplementationFile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dictionaryImplementation.toString()), "UTF-8"));
+
       bdmGenerator.BdmProtocolGenerator pr = new bdmGenerator.BdmProtocolGenerator(bdmProtocol);
-      BdmFrameGenerator fr = new BdmFrameGenerator(pr, bdmProtocol.frames.get(0));
-      BdmFieldGenerator fi = new BdmFieldGenerator(fr, bdmProtocol.frames.get(0).fields.get(0));
-      fi.appendCheckFieldsBounds(s2);
-      s2.append("----------------\n");
-      fr.appendFrameStructureDefinition(s2);
-      fr.appendCheckFieldsBounds(s2);
-      fr.appendCheckSpares(s2);
-      System.out.println(s2.toString());
 
-      pr.appendFrameStructureDefinition(outFile);
-      pr.appendFrameTypeSwitch(outFile);
+      pr.createHeaderFile(protocolHeaderFile);
+      pr.createImplementationFile(protocolImplementationFile);
 
-      outFile.close();
+      dictionaryHeaderFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated. */\n\n");
+      dictionaryImplementationFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated. */\n\n");
+      dictionaryHeaderFile.append("/* end of file */\n");
+      dictionaryImplementationFile.append("/* end of file */\n");
+
+      protocolHeaderFile.close();
+      protocolImplementationFile.close();
+      dictionaryHeaderFile.close();
+      dictionaryImplementationFile.close();
     }
     catch(Exception e)
     {
