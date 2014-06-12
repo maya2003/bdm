@@ -1,5 +1,7 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package bdmGenerator;
@@ -84,7 +86,7 @@ public class BdmProtocolGenerator
     StringBuilder s = new StringBuilder();
 
     s.append(m_bdmProtocol.m_copyrightNotice.getValue());
-    s.append("\n\n/* This file has been generated. */\n\n");
+    s.append("\n\n/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
 
     writer.append(s.toString());
   }

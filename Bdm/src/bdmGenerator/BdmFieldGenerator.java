@@ -1,10 +1,11 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package bdmGenerator;
 
-import bdmModel.BdmEnumValue;
 import bdmModel.BdmException;
 import bdmModel.BdmField;
 
@@ -16,6 +17,10 @@ public class BdmFieldGenerator
   protected final String m_fullNameUpper;
   protected final String m_min;
   protected final String m_max;
+
+  public final BdmValidityAttributeGenerator m_errorValues;
+  public final BdmValidityAttributeGenerator m_notAvailableValues;
+  public final BdmValidityAttributeGenerator m_validValues;
 
   public BdmFieldGenerator(BdmFrameGenerator bdmFrameGenerator, BdmField bdmField)
   {
@@ -38,6 +43,10 @@ public class BdmFieldGenerator
     m_max = new StringBuilder(m_fullNameUpper)
       .append('_')
       .append("MAX").toString();
+
+    m_errorValues        = new BdmValidityAttributeGenerator(bdmField.m_errorValues);
+    m_notAvailableValues = new BdmValidityAttributeGenerator(bdmField.m_notAvailableValues);
+    m_validValues        = new BdmValidityAttributeGenerator(bdmField.m_validValues);
   }
 
   /** "u8" */
@@ -103,109 +112,39 @@ public class BdmFieldGenerator
 
   public void appendCheckFieldsBounds(StringBuilder s)
   {
-    s.append("    switch("); s.append(getFullName()); s.append(")\n" +
-             "    {\n");
+    s.append("  switch("); s.append(getFullName()); s.append(")\n" +
+             "  {\n");
 
     /* Error values */
-    for(BdmEnumValue enumValue: m_bdmField.m_errorValues.m_values)
-    {
-      s.append("      case "); s.append(enumValue.getName()); s.append(":\n" +
-               "      {\n" +
-               "        /* field invalid */\n" +
-               "        valid = false;\n" +
-               "        break;\n" +
-               "      }\n\n");
-    }
+    m_errorValues.appendCheckSet(s,        "      /* field invalid */\n" +
+                                           "      valid = false;\n");
 
     /* Not available values */
-    for(BdmEnumValue enumValue: m_bdmField.m_notAvailableValues.m_values)
-    {
-      s.append("      case "); s.append(enumValue.getName()); s.append(":\n" +
-               "      {\n" +
-               "        /* The field is valid, do nothing. */\n" +
-               "        break;\n" +
-               "      }\n" + 
-               "\n");
-    }
+    m_notAvailableValues.appendCheckSet(s, "      /* The field is valid, do nothing. */\n");
 
     /* Valid values */
-    for(BdmEnumValue enumValue: m_bdmField.m_validValues.m_values)
-    {
-      s.append("      case "); s.append(enumValue.getName()); s.append(":\n" +
-               "      {\n" +
-               "        /* The field is valid, do nothing. */\n" +
-               "        break;\n" +
-               "      }\n" + 
-               "\n");
-    }
+    m_validValues.appendCheckSet(s,        "      /* The field is valid, do nothing. */\n");
 
-    s.append("      default:\n" +
-             "      {\n" +
-             "        /* field invalid */\n" +
-             "        valid = false;\n" +
-             "        break;\n" +
-             "      }\n");
+    s.append("    default:\n" +
+             "    {\n" +
+             "      /* field invalid */\n" +
+             "      valid = false;\n" +
+             "      break;\n" +
+             "    }\n");
 
-    s.append("    }\n");
+    s.append("  }\n");
 
     s.append("\n");
 
-    if(hasMin() || hasMax())
-    {
-      s.append("    if");
-    }
+    /* Error values */
+    m_errorValues.appendCheckRange(s, getFullName(),        "    /* field invalid */\n" +
+                                                            "    valid = false;\n");
 
-    if(hasMin() && hasMax())
-    {
-      s.append("(");
-    }
+    /* Not available values */
+    m_notAvailableValues.appendCheckRange(s, getFullName(), "    /* The field is valid, do nothing. */\n");
 
-    if(hasMin())
-    {
-      s.append("(");
-      s.append(getFullName());
-      s.append(" <= ");
-      s.append(getMin());
-      s.append(")");
-    };
-
-    if(hasMin() && hasMax())
-    {
-      s.append(
-        " || ");
-    }
-
-    if(hasMax())
-    {
-      s.append("(");
-      s.append(getFullName());
-      s.append(" >= ");
-      s.append(getMax());
-      s.append(")");
-    }
-
-    if(hasMin() && hasMax())
-    {
-      s.append(
-        ")");
-    }
-
-    if(hasMin() || hasMax())
-    {
-      s.append(
-          "\n");
-
-      s.append(
-        "    {\n" +
-        "      /* field invalid */\n" +
-        "      valid = false;\n" +
-        "    }\n");
-    }
-
-    if(hasMin() || hasMax())
-    {
-      s.append("\n");
-    }
+    /* Valid values */
+    m_validValues.appendCheckRange(s, getFullName(),        "    /* The field is valid, do nothing. */\n");
   }
 
 }

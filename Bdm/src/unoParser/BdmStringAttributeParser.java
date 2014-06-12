@@ -1,5 +1,7 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package unoParser;

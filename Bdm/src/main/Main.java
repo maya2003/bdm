@@ -1,5 +1,7 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package main;
@@ -82,8 +84,8 @@ public class Main
       pr.createHeaderFile(protocolHeaderFile);
       pr.createImplementationFile(protocolImplementationFile);
 
-      dictionaryHeaderFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated. */\n\n");
-      dictionaryImplementationFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated. */\n\n");
+      dictionaryHeaderFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
+      dictionaryImplementationFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
       dictionaryHeaderFile.append("/* end of file */\n");
       dictionaryImplementationFile.append("/* end of file */\n");
 
@@ -91,12 +93,14 @@ public class Main
       protocolImplementationFile.close();
       dictionaryHeaderFile.close();
       dictionaryImplementationFile.close();
+
+      System.out.println("End");
     }
     catch(Exception e)
     {
+      System.out.println("Error has occurred!");
+      e.printStackTrace();
     }
-
-    System.out.println("\nEnd.");
 
     // ???
     System.exit(0);

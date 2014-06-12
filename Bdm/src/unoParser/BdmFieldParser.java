@@ -1,5 +1,7 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package unoParser;
@@ -29,9 +31,9 @@ public class BdmFieldParser
   protected final BdmIntegerAttributeParser m_startByte;
   protected final BdmIntegerAttributeParser m_startBit;
   protected final BdmIntegerAttributeParser m_size;
-  protected final BdmSetAttributeParser     m_errorValues;
-  protected final BdmSetAttributeParser     m_notAvailableValues;
-  protected final BdmSetAttributeParser     m_validValues;
+  protected final BdmValidityAttributeParser     m_errorValues;
+  protected final BdmValidityAttributeParser     m_notAvailableValues;
+  protected final BdmValidityAttributeParser     m_validValues;
   protected final BdmIntegerAttributeParser m_offsetNumerator;
   protected final BdmIntegerAttributeParser m_gainNumerator;
   protected final BdmIntegerAttributeParser m_denominator;
@@ -52,32 +54,32 @@ public class BdmFieldParser
 
   public BdmFieldParser(BdmField bdmField, BdmCell bdmCell) throws IndexOutOfBoundsException
   {
-    m_fieldMarker         = new BdmStringAttributeParser (bdmField.m_fieldMarker,         bdmCell.getCell(),      bdmCell.getCell()); // special
-    m_requirementId       = new BdmStringAttributeParser (bdmField.m_requirementId,       bdmCell.getCell(1,  1), bdmCell.getCell());
-    m_coveredRequirements = new BdmStringAttributeParser (bdmField.m_coveredRequirements, bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_name                = new BdmStringAttributeParser (bdmField.m_name,                bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_id                  = new BdmStringAttributeParser (bdmField.m_id,                  bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_index               = new BdmIntegerAttributeParser(bdmField.m_index,               bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_type                = new BdmStringAttributeParser (bdmField.m_type,                bdmCell.getCell(1, -4), bdmCell.getCell());
-    m_notAvailableAllowed = new BdmBooleanAttributeParser(bdmField.m_notAvailableAllowed, bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_unit                = new BdmStringAttributeParser (bdmField.m_unit,                bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_startByte           = new BdmIntegerAttributeParser(bdmField.m_startByte,           bdmCell.getCell(1, -4), bdmCell.getCell());
-    m_startBit            = new BdmIntegerAttributeParser(bdmField.m_startBit,            bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_size                = new BdmIntegerAttributeParser(bdmField.m_size,                bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_errorValues         = new BdmSetAttributeParser    (bdmField.m_errorValues,         bdmCell.getCell(1, -4), bdmCell.getCell());
-    m_notAvailableValues  = new BdmSetAttributeParser    (bdmField.m_notAvailableValues,  bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_validValues         = new BdmSetAttributeParser    (bdmField.m_validValues,         bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_offsetNumerator     = new BdmIntegerAttributeParser(bdmField.m_offsetNumerator,     bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_gainNumerator       = new BdmIntegerAttributeParser(bdmField.m_gainNumerator,       bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_denominator         = new BdmIntegerAttributeParser(bdmField.m_denominator,         bdmCell.getCell(0,  2), bdmCell.getCell());
-    m_specificConversion  = new BdmBooleanAttributeParser(bdmField.m_specificConversion,  bdmCell.getCell(1, -4), bdmCell.getCell());
-  //m_realOffset          = new BdmStringAttributeParser (bdmField.m_realOffset,          bdmCell.getCell(0,  2), bdmCell.getCell()); // special
-  //m_realGain            = new BdmStringAttributeParser (bdmField.m_realGain,            bdmCell.getCell(0,  2), bdmCell.getCell()); // special
-    m_comment             = new BdmStringAttributeParser (bdmField.m_comment,             bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_fieldMarker         = new BdmStringAttributeParser  (bdmField.m_fieldMarker,         bdmCell.getCell(),      bdmCell.getCell()); // special
+    m_requirementId       = new BdmStringAttributeParser  (bdmField.m_requirementId,       bdmCell.getCell(1,  1), bdmCell.getCell());
+    m_coveredRequirements = new BdmStringAttributeParser  (bdmField.m_coveredRequirements, bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_name                = new BdmStringAttributeParser  (bdmField.m_name,                bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_id                  = new BdmStringAttributeParser  (bdmField.m_id,                  bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_index               = new BdmIntegerAttributeParser (bdmField.m_index,               bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_type                = new BdmStringAttributeParser  (bdmField.m_type,                bdmCell.getCell(1, -4), bdmCell.getCell());
+    m_notAvailableAllowed = new BdmBooleanAttributeParser (bdmField.m_notAvailableAllowed, bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_unit                = new BdmStringAttributeParser  (bdmField.m_unit,                bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_startByte           = new BdmIntegerAttributeParser (bdmField.m_startByte,           bdmCell.getCell(1, -4), bdmCell.getCell());
+    m_startBit            = new BdmIntegerAttributeParser (bdmField.m_startBit,            bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_size                = new BdmIntegerAttributeParser (bdmField.m_size,                bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_errorValues         = new BdmValidityAttributeParser(bdmField.m_errorValues,         bdmCell.getCell(1, -4), bdmCell.getCell());
+    m_notAvailableValues  = new BdmValidityAttributeParser(bdmField.m_notAvailableValues,  bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_validValues         = new BdmValidityAttributeParser(bdmField.m_validValues,         bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_offsetNumerator     = new BdmIntegerAttributeParser (bdmField.m_offsetNumerator,     bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_gainNumerator       = new BdmIntegerAttributeParser (bdmField.m_gainNumerator,       bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_denominator         = new BdmIntegerAttributeParser (bdmField.m_denominator,         bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_specificConversion  = new BdmBooleanAttributeParser (bdmField.m_specificConversion,  bdmCell.getCell(1, -4), bdmCell.getCell());
+  //m_realOffset          = new BdmStringAttributeParser  (bdmField.m_realOffset,          bdmCell.getCell(0,  2), bdmCell.getCell()); // special
+  //m_realGain            = new BdmStringAttributeParser  (bdmField.m_realGain,            bdmCell.getCell(0,  2), bdmCell.getCell()); // special
+    m_comment             = new BdmStringAttributeParser  (bdmField.m_comment,             bdmCell.getCell(1,  0), bdmCell.getCell());
 
-    m_rawMin              = new BdmIntegerAttributeParser(bdmField.m_rawMin,              bdmCell.getCell(-5, 5), bdmCell.getCell()); // remove
-    m_rawMax              = new BdmIntegerAttributeParser(bdmField.m_rawMax,              bdmCell.getCell( 1, 0), bdmCell.getCell()); // remove
-    m_destination         = new BdmStringAttributeParser (bdmField.m_destination,         bdmCell.getCell( 5,-5), bdmCell.getCell()); // remove
+    m_rawMin              = new BdmIntegerAttributeParser (bdmField.m_rawMin,              bdmCell.getCell(-5, 5), bdmCell.getCell()); // remove
+    m_rawMax              = new BdmIntegerAttributeParser (bdmField.m_rawMax,              bdmCell.getCell( 1, 0), bdmCell.getCell()); // remove
+    m_destination         = new BdmStringAttributeParser  (bdmField.m_destination,         bdmCell.getCell( 5,-5), bdmCell.getCell()); // remove
     bdmCell.getCell(2, -1);
   }
 

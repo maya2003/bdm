@@ -1,5 +1,7 @@
 /* Copyright (c) 2013, 2014 Olivier TARTROU
    See the file COPYING for copying permission.
+
+   https://sourceforge.net/projects/bdm-generator/
 */
 
 package bdmGenerator;
@@ -217,7 +219,11 @@ public class BdmFrameGenerator
              "  {\n");
     for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
     {
-      s.append("// copy " + bdmFieldGenerator.m_fullName + " to destination\n");
+      s.append("    ")
+       .append(bdmFieldGenerator.m_bdmField.m_destination.getValue())
+       .append(" = ")
+       .append(bdmFieldGenerator.m_fullName)
+       .append(";\n");
     }
     s.append("  }\n");
 
@@ -226,7 +232,7 @@ public class BdmFrameGenerator
 
   public void appendCheckFieldsBounds(StringBuilder s)
   {
-    s.append("      /* Check values of fields */\n");
+    s.append("  /* Check values of fields */\n");
 
     for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
     {
@@ -236,7 +242,7 @@ public class BdmFrameGenerator
 
   public void appendCheckSpares(StringBuilder s)
   {
-    s.append("      /* Check spare values */\n");
+    s.append("  /* Check spare values */\n");
 
     for(int spare = 0; spare < m_spare.size(); spare++)
     {
@@ -247,12 +253,12 @@ public class BdmFrameGenerator
         check = check << 1 | 1;
       }
 
-      s.append("      if(spare"); s.append(spare + 1); s.append(" != " + "0x"); s.append(Integer.toHexString(check).toUpperCase()); s.append(")\n" +
-      "      {\n" +
-      "        /* spare invalid */\n" +
-      "        valid = false;\n" +
-      "        break;\n" +
-      "      }\n\n");
+      s.append("  if(spare"); s.append(spare + 1); s.append(" != " + "0x"); s.append(Integer.toHexString(check).toUpperCase()); s.append(")\n" +
+               "  {\n" +
+               "    /* spare invalid */\n" +
+               "    valid = false;\n" +
+               "    break;\n" +
+               "  }\n\n");
     }
   }
 
