@@ -13,15 +13,22 @@ import com.google.common.base.CaseFormat;
 
 public class BdmCaseFormat
 {
+  protected final String m_fileName;
   protected final String m_lowerCamel;
   protected final String m_upperCamel;
   protected final String m_upper;
 
   public BdmCaseFormat(String lowerCamelName)
   {
+    m_fileName   = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, lowerCamelName);
     m_lowerCamel = lowerCamelName;
     m_upperCamel = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL,      lowerCamelName);
     m_upper      = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, lowerCamelName);
+  }
+
+  public String toFileName()
+  {
+    return m_fileName;
   }
 
   public String toLowerCamel()

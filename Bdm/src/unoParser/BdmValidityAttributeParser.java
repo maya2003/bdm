@@ -29,10 +29,6 @@ public class BdmValidityAttributeParser extends BdmAttributeParser
     // TODO Review parsing...
     // TODO Only min, only max, several ranges...
 
-    System.out.print("      Parsing: '");
-    System.out.print(m_rawValue);
-    System.out.println('\'');
-
     if(m_rawValue.charAt(0) == '[')
     {
       if(m_rawValue.charAt(m_rawValue.length() - 1) != ']')

@@ -17,19 +17,23 @@ import bdmModel.BdmProtocol;
 
 public class BdmProtocolGenerator
 {
+  BdmFileGenerator m_bdmFileGenerator;
   BdmProtocol m_bdmProtocol;
 
+  protected final String m_fileName;
   protected final String m_nameUpperCamel;
   protected final String m_fullNameUpper;
 
   protected BdmMethodGenerator m_bdmMethodGenerator;
   protected final List<BdmFrameGenerator> bdmFrameGenerators;
 
-  public BdmProtocolGenerator(BdmProtocol bdmProtocol)
+  public BdmProtocolGenerator(BdmFileGenerator bdmFileGenerator, BdmProtocol bdmProtocol)
   {
+    m_bdmFileGenerator = bdmFileGenerator;
     m_bdmProtocol = bdmProtocol;
 
     BdmCaseFormat bdmCaseFormat = new BdmCaseFormat(m_bdmProtocol.m_name.getValue());
+    m_fileName       = bdmCaseFormat.toFileName();
     m_nameUpperCamel = bdmCaseFormat.toUpperCamel();
     m_fullNameUpper  = bdmCaseFormat.toUpper();
 
@@ -43,6 +47,12 @@ public class BdmProtocolGenerator
     {
       bdmFrameGenerators.add(new BdmFrameGenerator(this, bdmFrame));
     }
+  }
+
+  /** "sample_protocol" */
+  public String getFileName()
+  {
+    return m_fileName;
   }
 
   /** "sampleProtocol" */
@@ -64,8 +74,9 @@ public class BdmProtocolGenerator
   }
 
 
-  public void createHeaderFile(Writer writer) throws IOException
+  public void createHeaderFile() throws IOException
   {
+    Writer writer = m_bdmFileGenerator.getFile(m_fileName + ".h");
     appendHeader(writer);
     writer.append(m_bdmProtocol.m_basicTypesInclude.getValue()); writer.append("\n");
     writer.append('\n');
@@ -73,17 +84,18 @@ public class BdmProtocolGenerator
     appendFrameIdDefinition(writer);
     appendFieldEnumsDefinition(writer);
     appendMethodsDeclaration(writer);
-    writer.append("/* end of file */\n");
+    writer.close();
   }
 
-  public void createImplementationFile(Writer writer) throws IOException
+  public void createImplementationFile() throws IOException
   {
+    Writer writer = m_bdmFileGenerator.getFile(m_fileName + ".c");
     appendHeader(writer);
-    writer.append("#include \""); writer.append(m_bdmProtocol.m_name.getValue()); writer.append(".h\"\n");
+    writer.append("#include \""); writer.append(m_fileName); writer.append(".h\"\n");
     writer.append('\n');
     appendFrameTypeSwitchDefinition(writer);
     appendCheckFramesContent(writer);
-    writer.append("/* end of file */\n");
+    writer.close();
   }
 
   public void appendHeader(Writer writer) throws IOException
