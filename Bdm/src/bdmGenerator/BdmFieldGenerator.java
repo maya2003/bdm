@@ -12,7 +12,8 @@ import bdmModel.BdmField;
 public class BdmFieldGenerator
 {
   protected BdmField m_bdmField;
-  
+
+  protected final String m_type;
   protected final String m_fullName;
   protected final String m_fullNameUpper;
   protected final String m_min;
@@ -27,6 +28,8 @@ public class BdmFieldGenerator
     m_bdmField = bdmField;
 
     BdmCaseFormat bdmCaseFormat = new BdmCaseFormat(m_bdmField.m_name.getValue());
+
+    m_type = bdmCaseFormat.toUpperCamel();
 
     m_fullName = new StringBuilder(bdmFrameGenerator.getName())
       .append("->")
@@ -50,9 +53,15 @@ public class BdmFieldGenerator
   }
 
   /** "u8" */
-  public String getType()
+  public String getFieldType()
   {
     return m_bdmField.m_type.getValue();
+  }
+
+  /** "SampleField" */
+  public String getType()
+  {
+    return m_type;
   }
 
   /** "sampleField" */

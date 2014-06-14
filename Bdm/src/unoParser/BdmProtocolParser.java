@@ -21,6 +21,7 @@ public class BdmProtocolParser
   protected final BdmStringAttributeParser m_copyrightNotice;
   protected final BdmStringAttributeParser m_name;
   protected final BdmStringAttributeParser m_frameTypeContainer;
+  protected final BdmStringAttributeParser m_basicTypesInclude;
 
   public static boolean isFrame(BdmCell bdmCell) throws IndexOutOfBoundsException
   {
@@ -32,9 +33,10 @@ public class BdmProtocolParser
     m_bdmProtocol = bdmProtocol;
     m_bdmCell     = bdmCell;
 
-    m_copyrightNotice    = new BdmStringAttributeParser(bdmProtocol.m_copyrightNotice,    bdmCell.getCell(3, 1), bdmCell.getCell());
-    m_name               = new BdmStringAttributeParser(bdmProtocol.m_name,               bdmCell.getCell(1, 0), bdmCell.getCell());
-    m_frameTypeContainer = new BdmStringAttributeParser(bdmProtocol.m_frameTypeContainer, bdmCell.getCell(0, 2), bdmCell.getCell());
+    m_copyrightNotice    = new BdmStringAttributeParser(bdmProtocol.m_copyrightNotice,    bdmCell.getCell(3,  1), bdmCell.getCell());
+    m_name               = new BdmStringAttributeParser(bdmProtocol.m_name,               bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_frameTypeContainer = new BdmStringAttributeParser(bdmProtocol.m_frameTypeContainer, bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_basicTypesInclude  = new BdmStringAttributeParser(bdmProtocol.m_basicTypesInclude,  bdmCell.getCell(1, -2), bdmCell.getCell());
   }
 
   public void parse() throws BdmException, IndexOutOfBoundsException
@@ -46,8 +48,9 @@ public class BdmProtocolParser
     m_name.parse();
     System.out.println(((BdmStringAttribute)m_name.m_bdmAttribute).getValue());
     m_frameTypeContainer.parse();
+    m_basicTypesInclude.parse();
 
-    m_bdmCell.getCell(3, -3);
+    m_bdmCell.getCell(3, -1);
 
     try
     {

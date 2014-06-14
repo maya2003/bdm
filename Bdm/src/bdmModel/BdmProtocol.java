@@ -16,6 +16,7 @@ public class BdmProtocol
   public final BdmStringAttribute m_copyrightNotice;
   public final BdmStringAttribute m_name;
   public final BdmStringAttribute m_frameTypeContainer;
+  public final BdmStringAttribute m_basicTypesInclude;
 
   public final List<BdmFrame>     frames;
 
@@ -24,6 +25,7 @@ public class BdmProtocol
     m_copyrightNotice    = new BdmStringAttribute("copyrightNotice",    true,  true,  null, null, null);
     m_name               = new BdmStringAttribute("name",               false, false, "",   null, null);
     m_frameTypeContainer = new BdmStringAttribute("frameTypeContainer", false, true,  "u8", null, null);
+    m_basicTypesInclude  = new BdmStringAttribute("basicTypesInclude",  false, false, "",   null, null);
 
     frames = new ArrayList<BdmFrame>();
   }

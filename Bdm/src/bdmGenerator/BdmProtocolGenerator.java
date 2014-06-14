@@ -67,7 +67,11 @@ public class BdmProtocolGenerator
   public void createHeaderFile(Writer writer) throws IOException
   {
     appendHeader(writer);
+    writer.append(m_bdmProtocol.m_basicTypesInclude.getValue()); writer.append("\n");
+    writer.append('\n');
     appendFrameStructureDefinition(writer);
+    appendFrameIdDefinition(writer);
+    appendFieldEnumsDefinition(writer);
     appendMethodsDeclaration(writer);
     writer.append("/* end of file */\n");
   }
@@ -75,7 +79,8 @@ public class BdmProtocolGenerator
   public void createImplementationFile(Writer writer) throws IOException
   {
     appendHeader(writer);
-    writer.append("#include \""); writer.append(m_bdmProtocol.m_name.getValue()); writer.append(".h\"\n\n");
+    writer.append("#include \""); writer.append(m_bdmProtocol.m_name.getValue()); writer.append(".h\"\n");
+    writer.append('\n');
     appendFrameTypeSwitchDefinition(writer);
     appendCheckFramesContent(writer);
     writer.append("/* end of file */\n");
@@ -106,6 +111,35 @@ public class BdmProtocolGenerator
     {
     }
     
+    writer.append(s.toString());
+  }
+
+  public void appendFrameIdDefinition(Writer writer) throws IOException
+  {
+    StringBuilder s = new StringBuilder();
+
+    s.append("typedef enum\n" +
+             "{\n");
+
+    for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
+    {
+      bdmFrameGenerator.appendFrameIdDefinition(s);
+    }
+
+    s.append("} " + getNameUpperCamel() + "_FrameId;\n\n");
+
+    writer.append(s.toString());
+  }
+
+  public void appendFieldEnumsDefinition(Writer writer) throws IOException
+  {
+    StringBuilder s = new StringBuilder();
+
+    for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
+    {
+      bdmFrameGenerator.appendFieldEnumsDefinition(s);
+    }
+
     writer.append(s.toString());
   }
 

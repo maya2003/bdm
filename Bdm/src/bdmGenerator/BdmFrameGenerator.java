@@ -121,7 +121,7 @@ public class BdmFrameGenerator
         spareIndex++;
       }
 
-      type.set(bdmFieldGenerator.getType());
+      type.set(bdmFieldGenerator.getFieldType());
       name.set(bdmFieldGenerator.getName());
       width.set(0, bdmFieldGenerator.m_bdmField.m_size.getValue());
 
@@ -162,7 +162,7 @@ public class BdmFrameGenerator
       }
 
       s.append(leftmargin.space());
-      s.append(bdmFieldGenerator.getType()); s.append(type.space(bdmFieldGenerator.getType()));
+      s.append(bdmFieldGenerator.getFieldType()); s.append(type.space(bdmFieldGenerator.getFieldType()));
       s.append(bdmFieldGenerator.getName()); s.append(":"); s.append(name.space(bdmFieldGenerator.getName()));
       s.append(width.space(0, bdmFieldGenerator.m_bdmField.m_size.getValue())); s.append(bdmFieldGenerator.m_bdmField.m_size.getValue());
       s.append(";\n");
@@ -185,6 +185,26 @@ public class BdmFrameGenerator
 
     s.append("#pragma pack()\n");
     s.append("\n");
+  }
+
+  public void appendFrameIdDefinition(StringBuilder s)
+  {
+    s.append("  "); s.append(getFullNameUpper()); s.append(",\n");
+  }
+
+  public void  appendFieldEnumsDefinition(StringBuilder s)
+  {
+    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+    {
+      s.append("typedef enum\n" +
+          "{\n");
+
+      bdmFieldGenerator.m_errorValues.appendEnumDefinition(s);
+      bdmFieldGenerator.m_notAvailableValues.appendEnumDefinition(s);
+      bdmFieldGenerator.m_validValues.appendEnumDefinition(s);
+
+      s.append("} ").append(getType()).append(bdmFieldGenerator.getType()).append("Value;\n\n");
+    }
   }
 
   public void appendFrameTypeCase(StringBuilder s)

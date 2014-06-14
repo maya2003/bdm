@@ -20,6 +20,41 @@ public class BdmValidityAttributeGenerator
     m_bdmValidityAttribute = bdmValidityAttribute;
   }
 
+  public void appendEnumDefinition(StringBuilder s)
+  {
+    BdmRange bdmRange = m_bdmValidityAttribute.getRange();
+
+    if(bdmRange != null)
+    {
+      // TODO spacers
+      s.append("  ");
+      s.append(bdmRange.getLowerBound().getName());
+      s.append(" = ");
+      s.append(bdmRange.getLowerBound().getValue());
+      s.append(";\n");
+
+      s.append("  ");
+      s.append(bdmRange.getUpperBound().getName());
+      s.append(" = ");
+      s.append(bdmRange.getUpperBound().getValue());
+      s.append(";\n");
+    }
+
+    BdmSet bdmSet = m_bdmValidityAttribute.getSet();
+
+    if(bdmSet != null)
+    {
+      for(BdmEnumValue enumValue: bdmSet.m_values)
+      {
+        s.append("  ");
+        s.append(enumValue.getName());
+        s.append(" = ");
+        s.append(enumValue.getValue());
+        s.append(";\n");
+      }
+    }
+  }
+
   public void appendCheckRange(StringBuilder s, String fullAttributeName, String actionStatement)
   {
     BdmRange bdmRange = m_bdmValidityAttribute.getRange();
