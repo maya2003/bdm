@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -12,6 +12,7 @@ import unoParser.BdmProtocolParser;
 
 import bdmGenerator.BdmFileGenerator;
 import bdmGenerator.BdmProtocolGenerator;
+import bdmGenerator.PyCrcGenerator;
 import bdmModel.BdmProtocol;
 
 import com.sun.star.sheet.XSpreadsheet;
@@ -28,6 +29,8 @@ public class Main
 {
   public static void main(String[] args) throws Exception
   {
+    new PyCrcGenerator().createCrcFiles();
+
     System.out.println("Connecting to LibreOffice...");
     XComponentContext xComponentContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
     Object desktopFrame = xComponentContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
@@ -51,17 +54,18 @@ public class Main
       XSpreadsheet xSheet = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(1));
 
       System.out.println("Parsing specification spreadsheet...");
-      BdmProtocol bdmProtocol = new bdmModel.BdmProtocol();
+      BdmProtocol bdmProtocol = new BdmProtocol();
       BdmCell bdmCell = new BdmCell(xSheet, 2, 1);
       BdmProtocolParser bdmProtocolParser = new BdmProtocolParser(bdmProtocol, bdmCell);
       bdmProtocolParser.parse();
 
-      System.out.println("Generating protocol and dictionary...");
+      System.out.println("Generating protocol...");
       BdmFileGenerator bdmFileGenerator = new BdmFileGenerator(System.getProperty("user.dir") + "/Generated sources/");
       BdmProtocolGenerator bdmProtocolGenerator = new BdmProtocolGenerator(bdmFileGenerator, bdmProtocol);
       bdmProtocolGenerator.createHeaderFile();
       bdmProtocolGenerator.createImplementationFile();
 
+      System.out.println("Generating dictionary...");
       Writer dictionaryHeaderFile         = bdmFileGenerator.getFile("dictionary.h");
       Writer dictionaryImplementationFile = bdmFileGenerator.getFile("dictionary.c");
       dictionaryHeaderFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");

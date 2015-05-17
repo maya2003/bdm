@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="Libraries/unoil.jar"/>
 	<classpathentry kind="lib" path="Libraries/juh.jar"/>
 	<classpathentry kind="lib" path="Libraries/guava-17.0.jar"/>
+	<classpathentry kind="lib" path="Libraries/jython-standalone-2.7-b2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
