@@ -7,6 +7,8 @@
 package main;
 
 import java.io.Writer;
+
+import unoGenerator.ProtocolLayoutGenerator;
 import unoParser.BdmCell;
 import unoParser.BdmProtocolParser;
 
@@ -72,6 +74,9 @@ public class Main
       dictionaryImplementationFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
       dictionaryHeaderFile.close();
       dictionaryImplementationFile.close();
+
+      ProtocolLayoutGenerator protocolLayoutGenerator = new ProtocolLayoutGenerator(xSpreadsheetDocument);
+      protocolLayoutGenerator.drawFrames(xSheet, bdmProtocol);
 
       System.out.println("End");
     }
