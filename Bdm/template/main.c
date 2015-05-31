@@ -4,28 +4,57 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
-#include <stdbool.h>
-#include <unistd.h>
 #include <stdio.h>
 
-extern bool Bdm_serialOpen(int *fd);
+#include "protocol.h"
 
 /*
  */
 int main(void)
 {
-  int fd;
-  char buffer[4] = "AAAA";
+  Bdm_FrameContext context;
+  u8 frame[] = {BDM_STX, BDM_STX, BDM_STX, 0, 1, 2, 3, 4, BDM_DLE, 1, BDM_DLE, BDM_STX, BDM_DLE, BDM_ETX, BDM_DLE, BDM_DLE, 5, 7, BDM_DLE};
 
-  Bdm_serialOpen(&fd);
+  BdmProtocol_initContext(&context);
 
-  printf("fd: %d\n", fd);
-  write(fd, "toto", 4);
-  sleep(1);
-  read(fd, buffer, 4);
+  puts("memory:");
+  Bdm_dumper(frame, sizeof(frame));
+  puts("\n");
 
-  printf("\"%4s\"", buffer);
+  puts("network:");
+  BdmProtocol_sendFrame(&context, frame, sizeof(frame));
 
   return 0;
+}
+
+/*
+ */
+void Bdm_dumper(const u8 *data, u8 size)
+{
+  int i;
+
+  for(i = 0; i < size; i++)
+  {
+    if(BDM_STX == data[i])
+    {
+      printf("<STX>");
+    }
+    else if(BDM_ETX == data[i])
+    {
+      printf("<ETX>");
+    }
+    else if(BDM_DLE == data[i])
+    {
+      printf("<DLE>");
+    }
+    else if(data[i] < ' ')
+    {
+      printf("<%02X>", data[i]);
+    }
+    else
+    {
+      printf("%c", data[i]);
+    }
+  }
 }
 
