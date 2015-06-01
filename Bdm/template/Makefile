@@ -3,26 +3,27 @@
 #
 # https://sourceforge.net/projects/bdm-generator/
 
-all: bdm_serial
+bdm: main.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o
+	gcc main.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o -o bdm -lpthread
 
-main.o: main.c
+main.o: main.c bdm.h
 	gcc -std=c11 -Wall -Wextra -c main.c -o main.o
 
-bdm_serial.o: bdm_serial.c
-	gcc -std=c11 -Wall -Wextra -c bdm_serial.c -o bdm_serial.o
+bdm_linux_serial.o: bdm_linux_serial.c bdm.h
+	gcc -std=c11 -Wall -Wextra -c bdm_linux_serial.c -o bdm_linux_serial.o
 
-bdm_serial_stream.o: bdm_serial_stream.c
-	gcc -std=c11 -Wall -Wextra -c bdm_serial_stream.c -o bdm_serial_stream.o
+bdm_linux_receive_thread.o: bdm_linux_receive_thread.c bdm.h
+	gcc -std=c11 -Wall -Wextra -c bdm_linux_receive_thread.c -o bdm_linux_receive_thread.o
 
-transparency.o: transparency.c
-	gcc -std=c11 -Wall -Wextra -c transparency.c -o transparency.o
+bdm_transparency.o: bdm_transparency.c bdm.h
+	gcc -std=c11 -Wall -Wextra -c bdm_transparency.c -o bdm_transparency.o
 
-protocol.o: protocol.c
-	gcc -std=c11 -Wall -Wextra -c protocol.c -o protocol.o
+bdm_protocol.o: bdm_protocol.c bdm.h
+	gcc -std=c11 -Wall -Wextra -c bdm_protocol.c -o bdm_protocol.o
 
-bdm_serial: main.o bdm_serial.o bdm_serial_stream.o transparency.o protocol.o
-	gcc main.o bdm_serial.o bdm_serial_stream.o transparency.o protocol.o -o bdm_serial -lpthread
+bdm_crc.o: bdm_crc.c bdm_crc.h
+	gcc -std=c11 -Wall -Wextra -c bdm_crc.c -o bdm_crc.o
 
 clean:
-	rm -f *~ *.o bdm_serial
+	rm -f *~ *.o bdm
 

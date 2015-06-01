@@ -32,9 +32,13 @@ typedef struct
 {
   const u8 frameStart;
   const u8 frameEnd;
-  const u8 escape;
+  const u8 escapeCharacter;
+} Bdm_TransparencyConfiguration;
 
+typedef struct
+{
   Bdm_TransparencyState state;
+  const Bdm_TransparencyConfiguration *configuration;
 } Bdm_TransparencyContext;
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -86,27 +90,45 @@ typedef struct
 {
   const Bdm_FrameConfiguration *configuration;
   Bdm_FrameState  state;
-  size_t          length;
+  size_t          size;
 
   Bdm_FrameHeader header;
   u8              data[100];
   Bdm_FrameFooter footer;
+
+  Bdm_TransparencyContext transparencyContext;
 } Bdm_FrameContext;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-extern void Bdm_dumper(const u8 *data, u8 size);
-extern bool Bdm_serialOpen(int *fd);
-extern bool Bdm_receiveStart(void);
-extern bool Bdm_write(const u8 *data, size_t size);
-extern bool BdmTransparency_initContext(Bdm_TransparencyContext *context);
-extern bool BdmTransparency_sendStx(const Bdm_TransparencyContext *context);
-extern bool BdmTransparency_sendEtx(const Bdm_TransparencyContext *context);
-extern bool BdmTransparency_sendData(const Bdm_TransparencyContext *context, const u8 *data, u16 size);
-extern bool BdmTransparency_octetReceived(Bdm_TransparencyContext *context, u8 octet);
-extern bool BdmProtocol_initContext(Bdm_FrameContext *context);
-extern bool BdmProtocol_sendFrame(Bdm_FrameContext *context, const u8 *data, u8 size);
-extern bool BdmProtocol_startOfFrameReceived(Bdm_FrameContext *context);
-extern bool BdmProtocol_endOfFrameReceived(Bdm_FrameContext *context);
-extern bool BdmProtocol_octetReceived(Bdm_FrameContext *context, u8 octet);
+typedef struct
+{
+  const char *device;
+  /* speed, etc */
+} Bdm_ProtocolConfiguration;
+
+typedef struct
+{
+  const Bdm_ProtocolConfiguration *configuration;
+
+  int fd;
+  Bdm_FrameContext frameContext;
+} Bdm_ProtocolContext;
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+extern bool Bdm_serialOpen(Bdm_ProtocolContext *context);
+extern bool Bdm_linuxReceiveThreadStart(Bdm_ProtocolContext *context);
+extern bool Bdm_write(const Bdm_ProtocolContext *context, const u8 *data, size_t size);
+extern bool Bdm_transparencyInit(Bdm_ProtocolContext *context);
+extern bool Bdm_transparencySendStx(const Bdm_ProtocolContext *context);
+extern bool Bdm_transparencySendEtx(const Bdm_ProtocolContext *context);
+extern bool Bdm_transparencySendData(const Bdm_ProtocolContext *context, const u8 *data, size_t size);
+extern bool Bdm_transparencyOctetReceived(Bdm_ProtocolContext *context, u8 octet);
+extern bool Bdm_protocolInit(Bdm_ProtocolContext *context);
+extern bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, const u8 *data, u8 size);
+extern bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context);
+extern bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context);
+extern bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet);
+extern void Bdm_dump(const u8 *data, size_t size);
 

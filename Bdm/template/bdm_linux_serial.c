@@ -4,15 +4,6 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
-#define _BSD_SOURCE
-#include <stdbool.h>
-#include <sys/types.h> // open
-#include <sys/stat.h>  // open
-#include <fcntl.h>     // open
-#include <stdio.h>     // perror
-#include <termios.h>
-#include <unistd.h>
-
 // TODO: Review man from "Canonical and noncanonical mode".
 // TODO: config: device selection
 // TODO: config: port type (EIA-232/EIA-422/EIA-485/...)
@@ -29,7 +20,7 @@
 // TODO: direction control and signalisation
 // TODO: external IO for direction control and signalisation
 // TODO: publish IO + inverted logic
-/*
+/* TODO:
 - tcsendbreak()
 - tcdrain()
 - tcflush()
@@ -37,24 +28,34 @@
 - cfmakeraw()
 */
 
+#define _BSD_SOURCE
+#include <stdbool.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+
+#include "bdm.h"
 
 /*
  */
-bool Bdm_serialOpen(int *fd)
+bool Bdm_serialOpen(Bdm_ProtocolContext *context)
 {
   int result;
   struct termios termios;
 
   /* Open the serial port */
-  *fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
-  if(*fd < 0)
+  context->fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
+  if(context->fd < 0)
   {
     perror("open()");
     return false;
   }
 
   /* Get the current configuration */
-  result = tcgetattr(*fd, &termios);
+  result = tcgetattr(context->fd, &termios);
   if(result != 0)
   {
     perror("tcgetattr()");
@@ -168,7 +169,7 @@ bool Bdm_serialOpen(int *fd)
   }
 
   /* Set the new configuration */
-  result = tcsetattr(*fd, TCSAFLUSH, &termios);
+  result = tcsetattr(context->fd, TCSAFLUSH, &termios);
   if(result != 0)
   {
     perror("tcsetattr()");
