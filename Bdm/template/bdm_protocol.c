@@ -107,8 +107,16 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 
       if(sizeof(Bdm_FrameHeader) == context->frameContext.size)
       {
-        context->frameContext.size  = 0;
-        context->frameContext.state = BDM_FS_WAIT_DATA;
+        if(context->frameContext.header.size)
+        {
+          context->frameContext.size  = 0;
+          context->frameContext.state = BDM_FS_WAIT_DATA;
+        }
+        else
+        {
+          context->frameContext.size  = 0;
+          context->frameContext.state = BDM_FS_WAIT_FOOTER;
+        }
       }
 
       break;
