@@ -85,9 +85,9 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
     /* Call callback */
 
     puts("memory:");
-    printf("  header:"); for(i = 0; i < sizeof(Bdm_FrameHeader); i++)           { printf("%02X", context->frameContext.header.data[i]); if(i+1 < sizeof(Bdm_FrameHeader))           printf(":"); } puts("");
-    printf("  data:");   for(i = 0; i < context->frameContext.header.size; i++) { printf("%02X", context->frameContext.data[i]);        if(i+1 < context->frameContext.header.size) printf(":"); } puts("");
-    printf("  footer:"); for(i = 0; i < sizeof(Bdm_FrameFooter); i++)           { printf("%02X", context->frameContext.footer.data[i]); if(i+1 < sizeof(Bdm_FrameFooter))           printf(":"); } puts("");
+    printf("  header: "); for(i = 0; i < sizeof(Bdm_FrameHeader); i++)           { printf("%02X", context->frameContext.header.data[i]); if(i+1 < sizeof(Bdm_FrameHeader))           printf(":"); } puts("");
+    printf("  data:   ");   for(i = 0; i < context->frameContext.header.size; i++) { printf("%02X", context->frameContext.data[i]);        if(i+1 < context->frameContext.header.size) printf(":"); } puts("");
+    printf("  footer: "); for(i = 0; i < sizeof(Bdm_FrameFooter); i++)           { printf("%02X", context->frameContext.footer.data[i]); if(i+1 < sizeof(Bdm_FrameFooter))           printf(":"); } puts("");
 
     context->frameContext.state = BDM_FS_WAIT_START;
   }

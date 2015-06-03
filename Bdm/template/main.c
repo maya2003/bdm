@@ -8,6 +8,7 @@
 // TODO: check lifecycle of objects accessed by address
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "bdm.h"
 
@@ -54,12 +55,16 @@ int main(void)
 
   printf("fd: %d\n", protocolContext.fd);
 
+  Bdm_linuxReceiveThreadStart(&protocolContext);
+
   puts("memory:");
   Bdm_dump(frame, sizeof(frame));
   puts("\n");
 
   puts("network:");
   Bdm_protocolSendFrame(&protocolContext, frame, sizeof(frame));
+
+  while(1) sleep(1);
 
   return 0;
 }
@@ -84,7 +89,7 @@ void Bdm_dump(const u8 *data, size_t size)
     {
       printf("<DLE>");
     }
-    else if(data[i] < ' ')
+    else if((data[i] < BDM_SPACE) || (data[i] >= BDM_DEL))
     {
       printf("<%02X>", data[i]);
     }

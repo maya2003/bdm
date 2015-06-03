@@ -20,7 +20,7 @@ bool Bdm_transparencyInit(Bdm_ProtocolContext *context)
  */
 bool Bdm_transparencySendStx(const Bdm_ProtocolContext *context)
 {
-  Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameStart); /////
+  Bdm_startFrame((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameStart);
   return true;
 }
 
@@ -28,10 +28,9 @@ bool Bdm_transparencySendStx(const Bdm_ProtocolContext *context)
  */
 bool Bdm_transparencySendEtx(const Bdm_ProtocolContext *context)
 {
-  Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameEnd); /////
+  Bdm_sendFrame((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameEnd);
   return true;
 }
-
 
 /*
  */
@@ -43,22 +42,22 @@ bool Bdm_transparencySendData(const Bdm_ProtocolContext *context, const u8 *data
   {
     if(context->frameContext.transparencyContext.configuration->frameStart == data[i])
     {
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter); /////
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameStart); /////
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter);
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameStart);
     }
     else if(context->frameContext.transparencyContext.configuration->frameEnd == data[i])
     {
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter); /////
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameEnd); /////
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter);
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->frameEnd);
     }
     else if(context->frameContext.transparencyContext.configuration->escapeCharacter == data[i])
     {
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter); /////
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter); /////
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter);
+      Bdm_appendData((Bdm_ProtocolContext *)context, context->frameContext.transparencyContext.configuration->escapeCharacter);
     }
     else
     {
-      Bdm_transparencyOctetReceived((Bdm_ProtocolContext *)context, data[i]); /////
+      Bdm_appendData((Bdm_ProtocolContext *)context, data[i]);
     }
   }
 

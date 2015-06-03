@@ -3,11 +3,14 @@
 #
 # https://sourceforge.net/projects/bdm-generator/
 
-bdm: main.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o
-	gcc main.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o -o bdm -lpthread
+bdm: main.o bdm_linux_serial_config.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o
+	gcc main.o bdm_linux_serial_config.o bdm_linux_serial.o bdm_linux_receive_thread.o bdm_transparency.o bdm_protocol.o bdm_crc.o -o bdm -lpthread
 
 main.o: main.c bdm.h
 	gcc -std=c11 -Wall -Wextra -c main.c -o main.o
+
+bdm_linux_serial_config.o: bdm_linux_serial_config.c bdm.h
+	gcc -std=c11 -Wall -Wextra -c bdm_linux_serial_config.c -o bdm_linux_serial_config.o
 
 bdm_linux_serial.o: bdm_linux_serial.c bdm.h
 	gcc -std=c11 -Wall -Wextra -c bdm_linux_serial.c -o bdm_linux_serial.o

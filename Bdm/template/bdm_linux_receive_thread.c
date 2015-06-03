@@ -4,8 +4,8 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
-// TODO: manage partial writes
 // TODO: manage reading full frame at once
+// TODO: manage partial reads
 // TODO: make thread cancelable
 // TODO TODO: define error management when hardware failure...
 
@@ -27,24 +27,6 @@ bool Bdm_linuxReceiveThreadStart(Bdm_ProtocolContext *context)
   result = pthread_create(&thread, NULL, Bdm_linuxReceiveThread, context);
 
   if(0 == result)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-/*
- */
-bool Bdm_write(const Bdm_ProtocolContext *context, const u8 *data, size_t size)
-{
-  ssize_t result;
-
-  result = write(context->fd, data, size);
-
-  if((ssize_t)size == result)
   {
     return true;
   }

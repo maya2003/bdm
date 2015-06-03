@@ -14,9 +14,11 @@ typedef uint32_t u32;
 
 typedef enum
 {
-  BDM_STX = 0x02,
-  BDM_ETX = 0x03,
-  BDM_DLE = 0x10
+  BDM_STX   = 0x02,
+  BDM_ETX   = 0x03,
+  BDM_DLE   = 0x10,
+  BDM_SPACE = 0x20,
+  BDM_DEL   = 0x7F,
 } Bdm_Character;
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +121,9 @@ typedef struct
 
 extern bool Bdm_serialOpen(Bdm_ProtocolContext *context);
 extern bool Bdm_linuxReceiveThreadStart(Bdm_ProtocolContext *context);
-extern bool Bdm_write(const Bdm_ProtocolContext *context, const u8 *data, size_t size);
+extern bool Bdm_startFrame(const Bdm_ProtocolContext *context, u8 data);
+extern bool Bdm_appendData(const Bdm_ProtocolContext *context, u8 data);
+extern bool Bdm_sendFrame(const Bdm_ProtocolContext *context, u8 data);
 extern bool Bdm_transparencyInit(Bdm_ProtocolContext *context);
 extern bool Bdm_transparencySendStx(const Bdm_ProtocolContext *context);
 extern bool Bdm_transparencySendEtx(const Bdm_ProtocolContext *context);
