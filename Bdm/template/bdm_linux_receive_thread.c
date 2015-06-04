@@ -22,9 +22,9 @@ static void *Bdm_linuxReceiveThread(void *context_);
 bool Bdm_linuxReceiveThreadStart(Bdm_ProtocolContext *context)
 {
   int result;
-  pthread_t thread;
+  pthread_t threadId;
 
-  result = pthread_create(&thread, NULL, Bdm_linuxReceiveThread, context);
+  result = pthread_create(&threadId, NULL, Bdm_linuxReceiveThread, context);
 
   if(0 == result)
   {

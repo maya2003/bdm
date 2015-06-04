@@ -71,7 +71,7 @@ int main(void)
   puts("\n--\n\nnetwork:");
   Bdm_protocolSendFrame(&protocolContext, frame1, sizeof(frame1));
 
-  while(1) sleep(1);
+  sleep(1);
 
   return 0;
 }
@@ -86,15 +86,15 @@ void Bdm_dump(const u8 *data, size_t size)
   {
     if(BDM_STX == data[i])
     {
-      printf("<STX>");
+      printf("<STX-02>");
     }
     else if(BDM_ETX == data[i])
     {
-      printf("<ETX>");
+      printf("<ETX-03>");
     }
     else if(BDM_DLE == data[i])
     {
-      printf("<DLE>");
+      printf("<DLE-10>");
     }
     else if((data[i] < BDM_SPACE) || (data[i] >= BDM_DEL))
     {
@@ -102,7 +102,7 @@ void Bdm_dump(const u8 *data, size_t size)
     }
     else
     {
-      printf("%c", data[i]);
+      printf("<%02X>", data[i]);
     }
   }
 }
