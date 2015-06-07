@@ -4,6 +4,8 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
+// TODO Manage case when we send less or more data than frame size!!
+
 #include <stdio.h>
 
 #include "bdm.h"
@@ -20,12 +22,25 @@ bool Bdm_protocolInit(Bdm_ProtocolContext *context)
 
 /*
  */
-bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, const u8 *data, u8 size)
+bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, size_t size)
 {
+  bool result;
+  size_t frameSize;
+
+  result = Bdm_getFrameSize(&frameSize, id);
+  if(!result)
+  {
+    return false;
+  }
+
+  if(size != frameSize)
+  {
+    return false;
+  }
+
 // TODO: swap
   context->frameContext.header.protocolSignature = context->frameContext.configuration->protocolSignature;
-  context->frameContext.header.command           = 5;
-  context->frameContext.header.size              = size;
+  context->frameContext.header.id                = id;
 
   /* compute CRC */
   context->frameContext.footer.crc = Bdm_crc16_init();
@@ -49,7 +64,7 @@ bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context)
 {
   if(BDM_FS_WAIT_START == context->frameContext.state)
   {
-    context->frameContext.size  = 0;
+    context->frameContext.fieldSize = 0;
     context->frameContext.state = BDM_FS_WAIT_HEADER;
   }
 
@@ -77,7 +92,7 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
     /* check CRC */
     crc = Bdm_crc16_init();
     crc = Bdm_crc16_update(crc, context->frameContext.header.data, sizeof(Bdm_FrameHeader));
-    crc = Bdm_crc16_update(crc, context->frameContext.data,        context->frameContext.header.size);
+    crc = Bdm_crc16_update(crc, context->frameContext.data,        context->frameContext.dataSize);
     crc = Bdm_crc16_update(crc, context->frameContext.footer.data, sizeof(Bdm_FrameFooter) - sizeof(Bdm_crc16_t));
 
     if(context->frameContext.footer.crc != crc)
@@ -92,17 +107,49 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
 
     /* dump frame */
     puts("\n\nmemory:");
-    printf("  header: "); for(i = 0; i < sizeof(Bdm_FrameHeader); i++) { printf("%02X", context->frameContext.header.data[i]); if(i+1 < sizeof(Bdm_FrameHeader))           printf(":"); } puts("");
-    printf("  data:   ");
-    if(context->frameContext.header.size)
+
+    printf("  header: ");
+    for(i = 0; i < sizeof(Bdm_FrameHeader); i++)
     {
-      for(i = 0; i < context->frameContext.header.size; i++)           { printf("%02X", context->frameContext.data[i]);        if(i+1 < context->frameContext.header.size) printf(":"); } puts("");
+      printf("%02X", context->frameContext.header.data[i]);
+
+      if(i+1 < sizeof(Bdm_FrameHeader))
+      {
+        printf(":");
+      }
+    }
+    puts("");
+
+    printf("  data:   ");
+    if(context->frameContext.dataSize)
+    {
+      for(i = 0; i < context->frameContext.dataSize; i++)
+      {
+        printf("%02X", context->frameContext.data[i]);
+
+        if(i+1 < context->frameContext.dataSize)
+        {
+          printf(":");
+        }
+      }
+      printf(" (%ld)\n", context->frameContext.dataSize);
     }
     else
     {
       puts("(none)");
     }
-    printf("  footer: "); for(i = 0; i < sizeof(Bdm_FrameFooter); i++) { printf("%02X", context->frameContext.footer.data[i]); if(i+1 < sizeof(Bdm_FrameFooter))           printf(":"); } puts("");
+
+    printf("  footer: ");
+    for(i = 0; i < sizeof(Bdm_FrameFooter); i++)
+    {
+      printf("%02X", context->frameContext.footer.data[i]);
+
+      if(i+1 < sizeof(Bdm_FrameFooter))
+      {
+        printf(":");
+      }
+    }
+    puts("");
 
     context->frameContext.state = BDM_FS_WAIT_START;
   }
@@ -114,22 +161,30 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
  */
 bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 {
+  bool result;
+
   switch(context->frameContext.state)
   {
     case BDM_FS_WAIT_HEADER:
     {
-      context->frameContext.header.data[context->frameContext.size++] = octet;
+      context->frameContext.header.data[context->frameContext.fieldSize++] = octet;
 
-      if(sizeof(Bdm_FrameHeader) == context->frameContext.size)
+      if(sizeof(Bdm_FrameHeader) == context->frameContext.fieldSize)
       {
-        if(context->frameContext.header.size)
+        result = Bdm_getFrameSize(&context->frameContext.dataSize, context->frameContext.header.id);
+        if(!result)
         {
-          context->frameContext.size  = 0;
+          return false;
+        }
+
+        if(context->frameContext.dataSize)
+        {
+          context->frameContext.fieldSize  = 0;
           context->frameContext.state = BDM_FS_WAIT_DATA;
         }
         else
         {
-          context->frameContext.size  = 0;
+          context->frameContext.fieldSize  = 0;
           context->frameContext.state = BDM_FS_WAIT_FOOTER;
         }
       }
@@ -139,11 +194,11 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 
     case BDM_FS_WAIT_DATA:
     {
-      context->frameContext.data[context->frameContext.size++] = octet;
+      context->frameContext.data[context->frameContext.fieldSize++] = octet;
 
-      if(context->frameContext.header.size == context->frameContext.size)
+      if(context->frameContext.fieldSize == context->frameContext.dataSize)
       {
-        context->frameContext.size  = 0;
+        context->frameContext.fieldSize = 0;
         context->frameContext.state = BDM_FS_WAIT_FOOTER;
       }
 
@@ -152,9 +207,9 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 
     case BDM_FS_WAIT_FOOTER:
     {
-      context->frameContext.footer.data[context->frameContext.size++] = octet;
+      context->frameContext.footer.data[context->frameContext.fieldSize++] = octet;
 
-      if(sizeof(Bdm_FrameFooter) == context->frameContext.size)
+      if(sizeof(Bdm_FrameFooter) == context->frameContext.fieldSize)
       {
         context->frameContext.state = BDM_FS_WAIT_END;
       }

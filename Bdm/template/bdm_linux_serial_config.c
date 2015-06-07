@@ -16,6 +16,8 @@
 // TODO: config: timeouts and delays
 // TODO: config: initial signalisation states
 // TODO: config: terminaison, pull-up, pull-down, and power
+// TODO: restore PARMRK (prefix framing and parity errors)
+// TODO: manage duplicated 0xFF due to PARMRK
 // TODO: bus access
 // TODO: direction control and signalisation
 // TODO: external IO for direction control and signalisation
@@ -68,7 +70,7 @@ bool Bdm_serialOpen(Bdm_ProtocolContext *context)
   termios.c_iflag |=  IGNBRK;
   termios.c_iflag &= ~BRKINT;
   termios.c_iflag &= ~IGNPAR;
-  termios.c_iflag |=  PARMRK;  /* prefix framing and parity errors */
+  termios.c_iflag &= ~PARMRK;
   termios.c_iflag |=  INPCK;   // CONFIG (parity)
   termios.c_iflag &= ~ISTRIP;
   termios.c_iflag &= ~INLCR;

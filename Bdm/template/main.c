@@ -40,7 +40,8 @@ int main(void)
     {
       configuration: &frameConfiguration,
       state:         BDM_FS_WAIT_START,
-      size:          0,
+//    fieldSize:     0,
+//    dataSize:      0,
       transparencyContext:
       {
         state:         BDM_TS_WAIT_STX,
@@ -49,7 +50,7 @@ int main(void)
     }
   };
 
-  u8 frame1[] = {BDM_STX, BDM_STX, BDM_STX, 0, 1, 2, 3, 4, BDM_DLE, 1, BDM_DLE, BDM_STX, BDM_DLE, BDM_ETX, BDM_DLE, BDM_DLE, 5, 7, BDM_DLE};
+  u8 frame1[] = {BDM_STX, BDM_STX, BDM_STX, 0, 1, 2, 3, 0xFF, 4, BDM_DLE, 1, BDM_DLE, BDM_STX, BDM_DLE, BDM_ETX, BDM_DLE, BDM_DLE, 5, 7, BDM_DLE};
   u8 frame2[] = {};
 
   Bdm_serialOpen(&protocolContext);
@@ -61,15 +62,15 @@ int main(void)
   puts("memory:");
   Bdm_dump(frame1, sizeof(frame1));
   puts("\n\nnetwork:");
-  Bdm_protocolSendFrame(&protocolContext, frame1, sizeof(frame1));
+  Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
 
   sleep(1);
   puts("\n--\n\nnetwork:");
-  Bdm_protocolSendFrame(&protocolContext, frame2, sizeof(frame2));
+  Bdm_protocolSendFrame(&protocolContext, 2, frame2, sizeof(frame2));
 
   sleep(1);
   puts("\n--\n\nnetwork:");
-  Bdm_protocolSendFrame(&protocolContext, frame1, sizeof(frame1));
+  Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
 
   sleep(1);
 

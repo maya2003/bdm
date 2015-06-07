@@ -45,6 +45,8 @@ typedef struct
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
+#define BDM_MAX_FRAME_SIZE 100
+
 typedef enum
 {
   BDM_FS_WAIT_START,
@@ -71,8 +73,8 @@ typedef union
 //  u16 sourceAddress;
 //  u16 destinationAddress;
 //  u8  frameCounter;
-    u8  command;
-    u8  size; //!!
+    u8  id;
+//  u8  size;
   };
   u8 data[0];
 } Bdm_FrameHeader;
@@ -92,10 +94,11 @@ typedef struct
 {
   const Bdm_FrameConfiguration *configuration;
   Bdm_FrameState  state;
-  size_t          size;
+  size_t          fieldSize;
+  size_t          dataSize;
 
   Bdm_FrameHeader header;
-  u8              data[100];
+  u8              data[BDM_MAX_FRAME_SIZE];
   Bdm_FrameFooter footer;
 
   Bdm_TransparencyContext transparencyContext;
@@ -130,9 +133,10 @@ extern bool Bdm_transparencySendEtx(const Bdm_ProtocolContext *context);
 extern bool Bdm_transparencySendData(const Bdm_ProtocolContext *context, const u8 *data, size_t size);
 extern bool Bdm_transparencyOctetReceived(Bdm_ProtocolContext *context, u8 octet);
 extern bool Bdm_protocolInit(Bdm_ProtocolContext *context);
-extern bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, const u8 *data, u8 size);
+extern bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, size_t size);
 extern bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet);
+extern bool Bdm_getFrameSize(size_t *size, u8 id);
 extern void Bdm_dump(const u8 *data, size_t size);
 
