@@ -141,5 +141,6 @@ extern bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet);
 extern bool Bdm_getFrameSize(size_t *size, u8 id);
-extern void Bdm_dump(const u8 *data, size_t size);
+extern void Bdm_dumpMemory(const u8 *data, size_t size);
+extern void Bdm_dumpFrame(const Bdm_ProtocolContext *context);
 

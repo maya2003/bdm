@@ -10,6 +10,7 @@
 
 #include "bdm.h"
 #include "bdm_crc.h"
+#include "bdm_frames.h"
 
 /*
  */
@@ -75,12 +76,9 @@ bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context)
 bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
 {
   Bdm_crc16_t crc;
-  unsigned i;
 
   if(BDM_FS_WAIT_END == context->frameContext.state)
   {
-    /* end of frame */
-
     /* check protocolSignature */
     if(context->frameContext.rxHeader.protocolSignature != context->frameContext.configuration->protocolSignature)
     {
@@ -100,55 +98,12 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
       return false;
     }
 
-    /* check command */
-
-    /* check command/size */
-
     /* dump frame */
     puts("rx:");
+    Bdm_dumpFrame(context);
 
-    printf("  header: ");
-    for(i = 0; i < sizeof(Bdm_FrameHeader); i++)
-    {
-      printf("%02X", context->frameContext.rxHeader.data[i]);
-
-      if(i+1 < sizeof(Bdm_FrameHeader))
-      {
-        printf(":");
-      }
-    }
-    puts("");
-
-    printf("  data:   ");
-    if(context->frameContext.dataSize)
-    {
-      for(i = 0; i < context->frameContext.dataSize; i++)
-      {
-        printf("%02X", context->frameContext.data[i]);
-
-        if(i+1 < context->frameContext.dataSize)
-        {
-          printf(":");
-        }
-      }
-      printf(" (%ld)\n", context->frameContext.dataSize);
-    }
-    else
-    {
-      puts("(none)");
-    }
-
-    printf("  footer: ");
-    for(i = 0; i < sizeof(Bdm_FrameFooter); i++)
-    {
-      printf("%02X", context->frameContext.rxFooter.data[i]);
-
-      if(i+1 < sizeof(Bdm_FrameFooter))
-      {
-        printf(":");
-      }
-    }
-    puts("\n");
+    /* manage frame at applicative level */
+    Bdm_frameReceived(context->frameContext.txHeader.id, context->frameContext.txHeader.data);
 
     context->frameContext.state = BDM_FS_WAIT_START;
   }

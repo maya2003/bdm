@@ -58,60 +58,20 @@ int main(void)
   Bdm_linuxReceiveThreadStart(&protocolContext);
 
   puts("tx:");
-  Bdm_dump(frame1, sizeof(frame1));
+  Bdm_dumpMemory(frame1, sizeof(frame1));
   Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
 
   puts("\ntx:");
-  Bdm_dump(frame2, sizeof(frame2));
+  Bdm_dumpMemory(frame2, sizeof(frame2));
   Bdm_protocolSendFrame(&protocolContext, 2, frame2, sizeof(frame2));
 
   puts("\ntx:");
-  Bdm_dump(frame1, sizeof(frame1));
+  Bdm_dumpMemory(frame1, sizeof(frame1));
   Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
   puts("\n--\n");
 
   sleep(1);
 
   return 0;
-}
-
-/*
- */
-void Bdm_dump(const u8 *data, size_t size)
-{
-  size_t i;
-
-  if(0 == size)
-  {
-    puts("(empty)");
-  }
-  else
-  {
-    for(i = 0; i < size; i++)
-    {
-      if(BDM_STX == data[i])
-      {
-        printf("<STX-02>");
-      }
-      else if(BDM_ETX == data[i])
-      {
-        printf("<ETX-03>");
-      }
-      else if(BDM_DLE == data[i])
-      {
-        printf("<DLE-10>");
-      }
-      else if((data[i] < BDM_SPACE) || (data[i] >= BDM_DEL))
-      {
-        printf("<%02X>", data[i]);
-      }
-      else
-      {
-        printf("<%02X>", data[i]);
-      }
-    }
-
-    puts("");
-  }
 }
 

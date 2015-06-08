@@ -1,0 +1,3 @@
+*.o
+bdm_crc.h
+bdm_crc.c
