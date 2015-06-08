@@ -55,22 +55,20 @@ int main(void)
 
   Bdm_serialOpen(&protocolContext);
 
-  printf("fd: %d\n\n", protocolContext.fd);
-
   Bdm_linuxReceiveThreadStart(&protocolContext);
 
-  puts("memory:");
+  puts("tx:");
   Bdm_dump(frame1, sizeof(frame1));
-  puts("\n\nnetwork:");
   Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
 
-  sleep(1);
-  puts("\n--\n\nnetwork:");
+  puts("\ntx:");
+  Bdm_dump(frame2, sizeof(frame2));
   Bdm_protocolSendFrame(&protocolContext, 2, frame2, sizeof(frame2));
 
-  sleep(1);
-  puts("\n--\n\nnetwork:");
+  puts("\ntx:");
+  Bdm_dump(frame1, sizeof(frame1));
   Bdm_protocolSendFrame(&protocolContext, 1, frame1, sizeof(frame1));
+  puts("\n--\n");
 
   sleep(1);
 
@@ -83,28 +81,37 @@ void Bdm_dump(const u8 *data, size_t size)
 {
   size_t i;
 
-  for(i = 0; i < size; i++)
+  if(0 == size)
   {
-    if(BDM_STX == data[i])
+    puts("(empty)");
+  }
+  else
+  {
+    for(i = 0; i < size; i++)
     {
-      printf("<STX-02>");
+      if(BDM_STX == data[i])
+      {
+        printf("<STX-02>");
+      }
+      else if(BDM_ETX == data[i])
+      {
+        printf("<ETX-03>");
+      }
+      else if(BDM_DLE == data[i])
+      {
+        printf("<DLE-10>");
+      }
+      else if((data[i] < BDM_SPACE) || (data[i] >= BDM_DEL))
+      {
+        printf("<%02X>", data[i]);
+      }
+      else
+      {
+        printf("<%02X>", data[i]);
+      }
     }
-    else if(BDM_ETX == data[i])
-    {
-      printf("<ETX-03>");
-    }
-    else if(BDM_DLE == data[i])
-    {
-      printf("<DLE-10>");
-    }
-    else if((data[i] < BDM_SPACE) || (data[i] >= BDM_DEL))
-    {
-      printf("<%02X>", data[i]);
-    }
-    else
-    {
-      printf("<%02X>", data[i]);
-    }
+
+    puts("");
   }
 }
 

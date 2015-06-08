@@ -84,7 +84,7 @@ bool Bdm_serialOpen(Bdm_ProtocolContext *context)
   termios.c_iflag &= ~IUTF8;
 
   /* output modes */
-  termios.c_oflag &= ~OPOST; /* refer to https://www.freebsd.org/cgi/man.cgi?query=termios&sektion=4 for explanation */
+  termios.c_oflag &= ~OPOST; /* refer to http://www.gnu.org/software/libc/manual/html_node/Output-Modes.html#Output-Modes for explanation */
   termios.c_oflag &= ~OLCUC;
   termios.c_oflag &= ~ONLCR;
   termios.c_oflag &= ~OCRNL;

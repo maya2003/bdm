@@ -39,20 +39,19 @@ bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, 
   }
 
 // TODO: swap
-  context->frameContext.header.protocolSignature = context->frameContext.configuration->protocolSignature;
-  context->frameContext.header.id                = id;
+  context->frameContext.txHeader.protocolSignature = context->frameContext.configuration->protocolSignature;
+  context->frameContext.txHeader.id                = id;
 
   /* compute CRC */
-  context->frameContext.footer.crc = Bdm_crc16_init();
-  context->frameContext.footer.crc = Bdm_crc16_update(context->frameContext.footer.crc, context->frameContext.header.data, sizeof(Bdm_FrameHeader));
-  context->frameContext.footer.crc = Bdm_crc16_update(context->frameContext.footer.crc, data, size);
-  context->frameContext.footer.crc = Bdm_crc16_update(context->frameContext.footer.crc, context->frameContext.footer.data, sizeof(Bdm_FrameFooter) - sizeof(Bdm_crc16_t));
+  context->frameContext.txFooter.crc = Bdm_crc16_init();
+  context->frameContext.txFooter.crc = Bdm_crc16_update(context->frameContext.txFooter.crc, context->frameContext.txHeader.data, sizeof(Bdm_FrameHeader));
+  context->frameContext.txFooter.crc = Bdm_crc16_update(context->frameContext.txFooter.crc, data, size);
+  context->frameContext.txFooter.crc = Bdm_crc16_update(context->frameContext.txFooter.crc, context->frameContext.txFooter.data, sizeof(Bdm_FrameFooter) - sizeof(Bdm_crc16_t));
 
-//TODO PB PB PB concurency between Tx and Rx on frame content!
   Bdm_transparencySendStx(context);
-  Bdm_transparencySendData(context, context->frameContext.header.data, sizeof(Bdm_FrameHeader));
+  Bdm_transparencySendData(context, context->frameContext.txHeader.data, sizeof(Bdm_FrameHeader));
   Bdm_transparencySendData(context, data, size);
-  Bdm_transparencySendData(context, context->frameContext.footer.data, sizeof(Bdm_FrameFooter));
+  Bdm_transparencySendData(context, context->frameContext.txFooter.data, sizeof(Bdm_FrameFooter));
   Bdm_transparencySendEtx(context);
 
   return true;
@@ -83,21 +82,21 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
     /* end of frame */
 
     /* check protocolSignature */
-    if(context->frameContext.header.protocolSignature != context->frameContext.configuration->protocolSignature)
+    if(context->frameContext.rxHeader.protocolSignature != context->frameContext.configuration->protocolSignature)
     {
-      printf("Wrong protocol signature received! Expected: %04X - Received: %04X\n", context->frameContext.configuration->protocolSignature, context->frameContext.header.protocolSignature);
+      printf("Wrong protocol signature received! Expected: %04X - Received: %04X\n", context->frameContext.configuration->protocolSignature, context->frameContext.rxHeader.protocolSignature);
       return false;
     }
 
     /* check CRC */
     crc = Bdm_crc16_init();
-    crc = Bdm_crc16_update(crc, context->frameContext.header.data, sizeof(Bdm_FrameHeader));
+    crc = Bdm_crc16_update(crc, context->frameContext.rxHeader.data, sizeof(Bdm_FrameHeader));
     crc = Bdm_crc16_update(crc, context->frameContext.data,        context->frameContext.dataSize);
-    crc = Bdm_crc16_update(crc, context->frameContext.footer.data, sizeof(Bdm_FrameFooter) - sizeof(Bdm_crc16_t));
+    crc = Bdm_crc16_update(crc, context->frameContext.rxFooter.data, sizeof(Bdm_FrameFooter) - sizeof(Bdm_crc16_t));
 
-    if(context->frameContext.footer.crc != crc)
+    if(context->frameContext.rxFooter.crc != crc)
     {
-      printf("Wrong CRC received! Expected: %04X - Computed: %04X\n", context->frameContext.footer.crc, crc);
+      printf("Wrong CRC received! Expected: %04X - Computed: %04X\n", context->frameContext.rxFooter.crc, crc);
       return false;
     }
 
@@ -106,12 +105,12 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
     /* check command/size */
 
     /* dump frame */
-    puts("\n\nmemory:");
+    puts("rx:");
 
     printf("  header: ");
     for(i = 0; i < sizeof(Bdm_FrameHeader); i++)
     {
-      printf("%02X", context->frameContext.header.data[i]);
+      printf("%02X", context->frameContext.rxHeader.data[i]);
 
       if(i+1 < sizeof(Bdm_FrameHeader))
       {
@@ -142,14 +141,14 @@ bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context)
     printf("  footer: ");
     for(i = 0; i < sizeof(Bdm_FrameFooter); i++)
     {
-      printf("%02X", context->frameContext.footer.data[i]);
+      printf("%02X", context->frameContext.rxFooter.data[i]);
 
       if(i+1 < sizeof(Bdm_FrameFooter))
       {
         printf(":");
       }
     }
-    puts("");
+    puts("\n");
 
     context->frameContext.state = BDM_FS_WAIT_START;
   }
@@ -167,11 +166,11 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
   {
     case BDM_FS_WAIT_HEADER:
     {
-      context->frameContext.header.data[context->frameContext.fieldSize++] = octet;
+      context->frameContext.rxHeader.data[context->frameContext.fieldSize++] = octet;
 
       if(sizeof(Bdm_FrameHeader) == context->frameContext.fieldSize)
       {
-        result = Bdm_getFrameSize(&context->frameContext.dataSize, context->frameContext.header.id);
+        result = Bdm_getFrameSize(&context->frameContext.dataSize, context->frameContext.rxHeader.id);
         if(!result)
         {
           return false;
@@ -179,12 +178,12 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 
         if(context->frameContext.dataSize)
         {
-          context->frameContext.fieldSize  = 0;
+          context->frameContext.fieldSize = 0;
           context->frameContext.state = BDM_FS_WAIT_DATA;
         }
         else
         {
-          context->frameContext.fieldSize  = 0;
+          context->frameContext.fieldSize = 0;
           context->frameContext.state = BDM_FS_WAIT_FOOTER;
         }
       }
@@ -207,7 +206,7 @@ bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 
     case BDM_FS_WAIT_FOOTER:
     {
-      context->frameContext.footer.data[context->frameContext.fieldSize++] = octet;
+      context->frameContext.rxFooter.data[context->frameContext.fieldSize++] = octet;
 
       if(sizeof(Bdm_FrameFooter) == context->frameContext.fieldSize)
       {

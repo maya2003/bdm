@@ -93,13 +93,16 @@ typedef union
 typedef struct
 {
   const Bdm_FrameConfiguration *configuration;
+
+  Bdm_FrameHeader txHeader;
+  Bdm_FrameFooter txFooter;
+
   Bdm_FrameState  state;
   size_t          fieldSize;
   size_t          dataSize;
-
-  Bdm_FrameHeader header;
+  Bdm_FrameHeader rxHeader;
   u8              data[BDM_MAX_FRAME_SIZE];
-  Bdm_FrameFooter footer;
+  Bdm_FrameFooter rxFooter;
 
   Bdm_TransparencyContext transparencyContext;
 } Bdm_FrameContext;
