@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -50,7 +50,7 @@ public class BdmProtocolParser
     m_frameTypeContainer.parse();
     m_basicTypesInclude.parse();
 
-    m_bdmCell.getCell(3, -1);
+    m_bdmCell.getCell(4, -1);
 
     try
     {

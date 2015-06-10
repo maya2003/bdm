@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -26,7 +26,14 @@ public class BdmIntegerAttributeParser extends BdmAttributeParser
   @Override
   public void doParse() throws BdmException
   {
-    ((BdmIntegerAttribute)m_bdmAttribute).setValue(Integer.parseInt(m_rawValue));
+    try
+    {
+      ((BdmIntegerAttribute)m_bdmAttribute).setValue(Integer.parseInt(m_rawValue));
+    }
+    catch(NumberFormatException e)
+    {
+      ((BdmIntegerAttribute)m_bdmAttribute).setValue(Integer.parseInt(m_rawValue.substring(2), 16));
+    }
   }
 
 }

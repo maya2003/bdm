@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -37,7 +37,7 @@ public class BdmProtocolGenerator
     m_nameUpperCamel = bdmCaseFormat.toUpperCamel();
     m_fullNameUpper  = bdmCaseFormat.toUpper();
 
-    m_bdmMethodGenerator = new BdmMethodGenerator("bool", new StringBuilder(getNameUpperCamel())
+    m_bdmMethodGenerator = new BdmMethodGenerator("void", new StringBuilder(getNameUpperCamel())
       .append("_frameReceived").toString());
     m_bdmMethodGenerator.addParameter(bdmProtocol.m_frameTypeContainer.getValue(), "frameId");
     m_bdmMethodGenerator.addParameter("u8 *", "frame");
@@ -74,7 +74,7 @@ public class BdmProtocolGenerator
   }
 
 
-  public void createHeaderFile() throws IOException
+  public void createHeaderFile() throws IOException, BdmException
   {
     Writer writer = m_bdmFileGenerator.getFile(m_fileName + ".h");
     appendHeader(writer);
@@ -126,7 +126,7 @@ public class BdmProtocolGenerator
     writer.append(s.toString());
   }
 
-  public void appendFrameIdDefinition(Writer writer) throws IOException
+  public void appendFrameIdDefinition(Writer writer) throws IOException, BdmException
   {
     StringBuilder s = new StringBuilder();
 
@@ -174,10 +174,9 @@ public class BdmProtocolGenerator
 
     m_bdmMethodGenerator.appendMethodDefinition(s);
     s.append("{\n" +
-             "  bool result;\n" +
-             '\n' +
              "  switch(frameId)\n" +
              "  {\n");
+
     for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
     {
       bdmFrameGenerator.appendFrameTypeCase(s);
@@ -186,13 +185,11 @@ public class BdmProtocolGenerator
     s.append("    default:\n" +
              "    {\n" +
              "      /* Unknown frame received! */\n" +
-             "      result = false;\n" +
              "      break;\n" +
              "    }\n" +
 
              "  }\n" +
              "\n" +
-             "  return result;\n" +
              "}\n\n");
 
     writer.append(s.toString());

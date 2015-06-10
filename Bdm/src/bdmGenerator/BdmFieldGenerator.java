@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -6,7 +6,6 @@
 
 package bdmGenerator;
 
-import bdmModel.BdmException;
 import bdmModel.BdmField;
 
 public class BdmFieldGenerator
@@ -82,28 +81,10 @@ public class BdmFieldGenerator
     return m_fullNameUpper;
   }
 
-  /** false | true */
-  public boolean hasMin()
-  {
-    return !m_bdmField.m_rawMin.isNull();
-  }
-
   /** "SAMPLE_PROTOCOL_SAMPLE_FRAME_SAMPLE_FIELD_MIN" */
   public String getMin()
   {
     return m_min;
-  }
-
-  /** 5 */
-  public int getMinValue() throws BdmException
-  {
-    return m_bdmField.m_rawMin.getValue();
-  }
-
-  /** false | true */
-  public boolean hasMax()
-  {
-    return !m_bdmField.m_rawMax.isNull();
   }
 
   /** "SAMPLE_PROTOCOL_SAMPLE_FRAME_SAMPLE_FIELD_MAX" */
@@ -112,38 +93,41 @@ public class BdmFieldGenerator
     return m_max;
   }
 
-  /** 7 */
-  public int getMaxValue() throws BdmException
-  {
-    return m_bdmField.m_rawMax.getValue();
-  }
-
 
   public void appendCheckFieldsBounds(StringBuilder s)
   {
-    s.append("  switch("); s.append(getFullName()); s.append(")\n" +
-             "  {\n");
+    if(
+        (!m_errorValues.m_bdmValidityAttribute.isNull())
+        ||
+        (!m_notAvailableValues.m_bdmValidityAttribute.isNull())
+        ||
+        (!m_validValues.m_bdmValidityAttribute.isNull())
+      )
+    {
+      s.append("  switch("); s.append(getFullName()); s.append(")\n" +
+               "  {\n");
 
-    /* Error values */
-    m_errorValues.appendCheckSet(s,        "      /* field invalid */\n" +
-                                           "      valid = false;\n");
+      /* Error values */
+      m_errorValues.appendCheckSet(s,        "      /* field invalid */\n" +
+                                             "      valid = false;\n");
 
-    /* Not available values */
-    m_notAvailableValues.appendCheckSet(s, "      /* The field is valid, do nothing. */\n");
+      /* Not available values */
+      m_notAvailableValues.appendCheckSet(s, "      /* The field is valid, do nothing. */\n");
 
-    /* Valid values */
-    m_validValues.appendCheckSet(s,        "      /* The field is valid, do nothing. */\n");
+      /* Valid values */
+      m_validValues.appendCheckSet(s,        "      /* The field is valid, do nothing. */\n");
 
-    s.append("    default:\n" +
-             "    {\n" +
-             "      /* field invalid */\n" +
-             "      valid = false;\n" +
-             "      break;\n" +
-             "    }\n");
+      s.append("    default:\n" +
+               "    {\n" +
+               "      /* field invalid */\n" +
+               "      valid = false;\n" +
+               "      break;\n" +
+               "    }\n");
 
-    s.append("  }\n");
+      s.append("  }\n");
 
-    s.append("\n");
+      s.append("\n");
+    }
 
     /* Error values */
     m_errorValues.appendCheckRange(s, getFullName(),        "    /* field invalid */\n" +

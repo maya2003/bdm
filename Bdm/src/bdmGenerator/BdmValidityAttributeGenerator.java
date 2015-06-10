@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -28,16 +28,17 @@ public class BdmValidityAttributeGenerator
     {
       // TODO spacers
       s.append("  ");
-      s.append(bdmRange.getLowerBound().getName());
-      s.append(" = ");
+      s.append(new BdmCaseFormat(bdmRange.getLowerBound().getName()).toUpper());
+      s.append(" = 0x");
       s.append(bdmRange.getLowerBound().getValue());
-      s.append(";\n");
+      s.append(",\n");
 
       s.append("  ");
-      s.append(bdmRange.getUpperBound().getName());
-      s.append(" = ");
-      s.append(bdmRange.getUpperBound().getValue());
-      s.append(";\n");
+      s.append(new BdmCaseFormat(bdmRange.getUpperBound().getName()).toUpper());
+      s.append(" = 0x");
+      // TODO: check max ranges / set limits
+      s.append(Long.toHexString(bdmRange.getUpperBound().getValue()).toUpperCase());
+      s.append(",\n");
     }
 
     BdmSet bdmSet = m_bdmValidityAttribute.getSet();
@@ -47,10 +48,11 @@ public class BdmValidityAttributeGenerator
       for(BdmEnumValue enumValue: bdmSet.m_values)
       {
         s.append("  ");
-        s.append(enumValue.getName());
-        s.append(" = ");
-        s.append(enumValue.getValue());
-        s.append(";\n");
+        s.append(new BdmCaseFormat(enumValue.getName()).toUpper());
+        s.append(" = 0x");
+        // TODO: check max ranges / set limits
+        s.append(Long.toHexString(enumValue.getValue()));
+        s.append(",\n");
       }
     }
   }
@@ -76,7 +78,7 @@ public class BdmValidityAttributeGenerator
         s.append("(");
         s.append(fullAttributeName);
         s.append(" <= ");
-        s.append(bdmRange.getLowerBound().getName());
+        s.append(new BdmCaseFormat(bdmRange.getLowerBound().getName()).toUpper());
         s.append(")");
       };
 
@@ -90,7 +92,7 @@ public class BdmValidityAttributeGenerator
         s.append("(");
         s.append(fullAttributeName);
         s.append(" >= ");
-        s.append(bdmRange.getUpperBound().getName());
+        s.append(new BdmCaseFormat(bdmRange.getUpperBound().getName()).toUpper());
         s.append(")");
       }
 
@@ -117,7 +119,7 @@ public class BdmValidityAttributeGenerator
     {
       for(BdmEnumValue enumValue: bdmSet.m_values)
       {
-        s.append("    case "); s.append(enumValue.getName()); s.append(":\n" +
+        s.append("    case "); s.append(new BdmCaseFormat(enumValue.getName()).toUpper()); s.append(":\n" +
                  "    {\n")
          .append(actionStatement)
          .append("      break;\n" +

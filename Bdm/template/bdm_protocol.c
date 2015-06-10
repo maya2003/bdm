@@ -4,7 +4,7 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
-// TODO Manage case when we send less or more data than frame size!!
+// TODO Manage cases when we send less or more data than frame size!!
 
 #include <stdio.h>
 
@@ -39,7 +39,6 @@ bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, 
     return false;
   }
 
-// TODO: swap
   context->frameContext.txHeader.protocolSignature = context->frameContext.configuration->protocolSignature;
   context->frameContext.txHeader.id                = id;
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -49,7 +49,7 @@ public class BdmFrameGenerator
 
     m_spare = new ArrayList<Integer>();
 
-    m_bdmMethodGenerator = new BdmMethodGenerator("bool", new StringBuilder()
+    m_bdmMethodGenerator = new BdmMethodGenerator("void", new StringBuilder()
       .append(bdmProtocolGenerator.getNameUpperCamel())
       .append("_manage")
       .append(getNameUpperCamel())
@@ -114,6 +114,7 @@ public class BdmFrameGenerator
 
       if(fieldShift > currentShift)
       {
+///// TODO u8 spare;
         type.set(2); /* u8 */
         name.set(5, spareIndex); /* "spare7" */
         width.set(0, fieldShift - currentShift);
@@ -148,16 +149,29 @@ public class BdmFrameGenerator
     {
       int fieldShift = bdmFieldGenerator.m_bdmField.m_startByte.getValue() * 8 + bdmFieldGenerator.m_bdmField.m_startBit.getValue();
 
-      if(fieldShift > currentShift)
+      /* Insert spare bits, if needed */
+      int distance = fieldShift - currentShift;
+      int nbSpares = (distance + 7) / 8;
+
+      for(int i = 0; i < nbSpares; i++)
       {
+        /* bit spares */
         s.append(leftmargin.space());
         s.append("u8"); s.append(type.space(2)); /* u8 */
         s.append("spare"); s.append(spareIndex); s.append(":"); s.append(name.space(5, spareIndex)); /* spare7 */
-        s.append(width.space(0, fieldShift - currentShift)); s.append(fieldShift - currentShift);
+        if(distance >= 8)
+        {
+          s.append(width.space(0, 8)); s.append(8);
+          m_spare.add(8);
+        }
+        else
+        {
+          s.append(width.space(0, distance)); s.append(distance);
+          m_spare.add(distance);
+        }
         s.append(";\n");
 
-        m_spare.add(fieldShift - currentShift);
-
+        distance -= 8;
         spareIndex++;
       }
 
@@ -187,23 +201,33 @@ public class BdmFrameGenerator
     s.append("\n");
   }
 
-  public void appendFrameIdDefinition(StringBuilder s)
+  public void appendFrameIdDefinition(StringBuilder s) throws BdmException
   {
-    s.append("  "); s.append(getFullNameUpper()); s.append(",\n");
+    // TODO: check max ranges / set limits
+    s.append("  "); s.append(getFullNameUpper()); s.append(" = 0x"); s.append(Long.toHexString(m_bdmFrame.m_id.getValue()).toUpperCase()); s.append(",\n");
   }
 
-  public void  appendFieldEnumsDefinition(StringBuilder s)
+  public void appendFieldEnumsDefinition(StringBuilder s)
   {
     for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
     {
-      s.append("typedef enum\n" +
-          "{\n");
+      if(
+          (!bdmFieldGenerator.m_errorValues.m_bdmValidityAttribute.isNull())
+          ||
+          (!bdmFieldGenerator.m_notAvailableValues.m_bdmValidityAttribute.isNull())
+          ||
+          (!bdmFieldGenerator.m_validValues.m_bdmValidityAttribute.isNull())
+        )
+      {
+        s.append("typedef enum\n" +
+            "{\n");
 
-      bdmFieldGenerator.m_errorValues.appendEnumDefinition(s);
-      bdmFieldGenerator.m_notAvailableValues.appendEnumDefinition(s);
-      bdmFieldGenerator.m_validValues.appendEnumDefinition(s);
+        bdmFieldGenerator.m_errorValues.appendEnumDefinition(s);
+        bdmFieldGenerator.m_notAvailableValues.appendEnumDefinition(s);
+        bdmFieldGenerator.m_validValues.appendEnumDefinition(s);
 
-      s.append("} ").append(getType()).append(bdmFieldGenerator.getType()).append("Value;\n\n");
+        s.append("} ").append(getType()).append(bdmFieldGenerator.getType()).append("Value;\n\n");
+      }
     }
   }
 
@@ -212,7 +236,7 @@ public class BdmFrameGenerator
     s.append("    case "); s.append(getFullNameUpper()); s.append(":\n");
     s.append("    {\n" +
              "      /* Manage frame */\n" +
-             "      result = ");
+             "      ");
     m_bdmMethodGenerator.appendMethodCall(s, new String[]{"frame"}, true);
     s.append("      break;\n" +
              "    }\n\n");
@@ -233,19 +257,8 @@ public class BdmFrameGenerator
 
     appendCheckFieldsBounds(s);
     appendCheckSpares(s);
-
-    s.append("  /* Copy frame fields to BDM fields */\n" +
-             "  if(valid)\n" +
-             "  {\n");
-    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
-    {
-      s.append("    ")
-       .append(bdmFieldGenerator.m_bdmField.m_destination.getValue())
-       .append(" = ")
-       .append(bdmFieldGenerator.m_fullName)
-       .append(";\n");
-    }
-    s.append("  }\n");
+    appendDumpFrame(s);
+    //appendCopyToDestination(s);
 
     s.append("}\n\n");
   }
@@ -273,13 +286,49 @@ public class BdmFrameGenerator
         check = check << 1 | 1;
       }
 
-      s.append("  if(spare"); s.append(spare + 1); s.append(" != " + "0x"); s.append(Integer.toHexString(check).toUpperCase()); s.append(")\n" +
+      s.append("  if("); s.append(this.getName()); s.append("->spare"); s.append(spare + 1); s.append(" != " + "0x"); s.append(Integer.toHexString(check).toUpperCase()); s.append(")\n" +
                "  {\n" +
                "    /* spare invalid */\n" +
-               "    valid = false;\n" +
-               "    break;\n" +
+               "    //valid = false;\n" +
                "  }\n\n");
     }
   }
 
+  public void appendCopyToDestination(StringBuilder s)
+  {
+    s.append("  /* Copy frame fields to BDM fields */\n" +
+             "  if(valid)\n" +
+             "  {\n");
+
+    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+    {
+      s.append("    ")
+       .append(bdmFieldGenerator.m_bdmField.m_destination.getValue())
+       .append(" = ")
+       .append(bdmFieldGenerator.m_fullName)
+       .append(";\n");
+    }
+
+    s.append("  }\n");
+  }
+
+  public void appendDumpFrame(StringBuilder s)
+  {
+    s.append("  /* Dump frame and frame fields */\n" +
+             "  if(valid)\n" +
+             "  {\n");
+
+    s.append("    printf(\"").append(getNameUpperCamel()).append(":\\n\");\n");
+
+    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+    {
+      s.append("    printf(\"  .")
+       .append(bdmFieldGenerator.getName())
+       .append(": %d\\n\", ")
+       .append(bdmFieldGenerator.m_fullName)
+       .append(");\n");
+    }
+
+    s.append("  }\n");
+  }
 }

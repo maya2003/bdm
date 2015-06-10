@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -42,9 +42,6 @@ public class BdmFieldParser
 //protected final BdmStringAttributeParser  m_realGain;   // special
   protected final BdmStringAttributeParser  m_comment;
 
-  // TODO
-  protected final BdmIntegerAttributeParser m_rawMin;      // remove
-  protected final BdmIntegerAttributeParser m_rawMax;      // remove
   protected final BdmStringAttributeParser  m_destination; // remove
 
   public static boolean isField(BdmCell bdmCell) throws IndexOutOfBoundsException
@@ -77,9 +74,7 @@ public class BdmFieldParser
   //m_realGain            = new BdmStringAttributeParser  (bdmField.m_realGain,            bdmCell.getCell(0,  2), bdmCell.getCell()); // special
     m_comment             = new BdmStringAttributeParser  (bdmField.m_comment,             bdmCell.getCell(1,  0), bdmCell.getCell());
 
-    m_rawMin              = new BdmIntegerAttributeParser (bdmField.m_rawMin,              bdmCell.getCell(-5, 5), bdmCell.getCell()); // remove
-    m_rawMax              = new BdmIntegerAttributeParser (bdmField.m_rawMax,              bdmCell.getCell( 1, 0), bdmCell.getCell()); // remove
-    m_destination         = new BdmStringAttributeParser  (bdmField.m_destination,         bdmCell.getCell( 5,-5), bdmCell.getCell()); // remove
+    m_destination         = new BdmStringAttributeParser  (bdmField.m_destination,         bdmCell.getCell(1,  0), bdmCell.getCell()); // remove
     bdmCell.getCell(2, -1);
   }
 
@@ -110,9 +105,7 @@ public class BdmFieldParser
     //m_realGain.parse();   // special
     m_comment.parse();
 
-    m_rawMin.parse();
-    m_rawMax.parse();
-    m_destination.parse();
+    m_destination.parse(); // remove
   }
 
 }

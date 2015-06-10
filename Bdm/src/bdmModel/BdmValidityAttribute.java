@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -17,6 +17,7 @@ public class BdmValidityAttribute extends BdmAttribute
 
     m_bdmRange = null;
     m_bdmSet   = null;
+    m_isNull   = true;
   }
 
   @Override
@@ -24,6 +25,7 @@ public class BdmValidityAttribute extends BdmAttribute
   {
     m_bdmRange = null;
     m_bdmSet   = null;
+    m_isNull   = true;
   }
 
   public BdmRange getRange()
@@ -34,6 +36,7 @@ public class BdmValidityAttribute extends BdmAttribute
   public void setRange(BdmRange bdmRange)
   {
     m_bdmRange = bdmRange;
+    m_isNull = false; // TODO
   }
 
   public BdmSet getSet()
@@ -44,6 +47,7 @@ public class BdmValidityAttribute extends BdmAttribute
   public void setSet(BdmSet bdmSet)
   {
     m_bdmSet = bdmSet;
+    m_isNull = false; // TODO
   }
 
 }

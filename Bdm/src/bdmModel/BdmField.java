@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -39,8 +39,6 @@ public class BdmField
 //public final BdmStringAttribute   m_realGain;   // special
   public final BdmStringAttribute   m_comment;
 
-  public final BdmIntegerAttribute  m_rawMin;      // remove
-  public final BdmIntegerAttribute  m_rawMax;      // remove
   public final BdmStringAttribute   m_destination; // remove
 
   public BdmField() throws BdmException //TODO !!
@@ -68,9 +66,7 @@ public class BdmField
   //m_realGain            = new BdmStringAttribute  ("realGain",            true,  false, null,    null, null); // special
     m_comment             = new BdmStringAttribute  ("comment",             true,  true,  null,    null, null);
 
-    m_rawMin              = new BdmIntegerAttribute ("rawMin",              true,  true,  null,    0,    null); // remove
-    m_rawMax              = new BdmIntegerAttribute ("rawMax",              true,  true,  null,    0,    null); // remove
-    m_destination         = new BdmStringAttribute  ("destination",         true,  false, null,    null, null); // remove
+    m_destination         = new BdmStringAttribute  ("destination",         true,  true, null,    null, null); // remove
   }
 
 }
