@@ -11,11 +11,13 @@ import java.io.Writer;
 import unoGenerator.ProtocolLayoutGenerator;
 import unoParser.BdmCell;
 import unoParser.BdmProtocolParser;
+import unoParser.data.BdmDataDictionaryParser;
 
 import bdmGenerator.BdmFileGenerator;
 import bdmGenerator.BdmProtocolGenerator;
 import bdmGenerator.PyCrcGenerator;
 import bdmModel.BdmProtocol;
+import bdmModel.data.BdmDataDictionary;
 
 import com.sun.star.sheet.XSpreadsheet;
 import com.sun.star.sheet.XSpreadsheetDocument;
@@ -53,13 +55,20 @@ public class Main
       /* Get the sheet */
       XSpreadsheets xSpreadsheets = xSpreadsheetDocument.getSheets();
       XIndexAccess xIndexAccess = (XIndexAccess)UnoRuntime.queryInterface(XIndexAccess.class, xSpreadsheets);
-      XSpreadsheet xSheet = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(1));
+      XSpreadsheet xSpreadsheet1 = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(1));
+      XSpreadsheet xSpreadsheet2 = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(3));
 
       System.out.println("Parsing specification spreadsheet...");
       BdmProtocol bdmProtocol = new BdmProtocol();
-      BdmCell bdmCell = new BdmCell(xSheet, 2, 1);
+      BdmCell bdmCell = new BdmCell(xSpreadsheet1, 2, 1);
       BdmProtocolParser bdmProtocolParser = new BdmProtocolParser(bdmProtocol, bdmCell);
       bdmProtocolParser.parse();
+
+      System.out.println("Parsing data dictionary spreadsheet...");
+      BdmDataDictionary bdmDataDictionary = new BdmDataDictionary();
+      bdmCell = new BdmCell(xSpreadsheet2, 3, 0);
+      BdmDataDictionaryParser bdmDataDictionaryParser = new BdmDataDictionaryParser(bdmDataDictionary, bdmCell);
+      bdmDataDictionaryParser.parse();
 
       System.out.println("Generating protocol...");
       BdmFileGenerator bdmFileGenerator = new BdmFileGenerator(System.getProperty("user.dir") + "/Generated sources/");
@@ -75,10 +84,11 @@ public class Main
       dictionaryHeaderFile.close();
       dictionaryImplementationFile.close();
 
+      System.out.println("Generating protocol layout...");
       ProtocolLayoutGenerator protocolLayoutGenerator = new ProtocolLayoutGenerator(xSpreadsheetDocument);
-      protocolLayoutGenerator.drawFrames(xSheet, bdmProtocol);
+      protocolLayoutGenerator.drawFrames(xSpreadsheet1, bdmProtocol);
 
-      System.out.println("End");
+      System.out.println("End.");
     }
     catch(Exception e)
     {
