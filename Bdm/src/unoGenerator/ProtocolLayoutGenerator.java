@@ -211,7 +211,7 @@ public class ProtocolLayoutGenerator
 
       for(BdmFrame bdmFrame: bdmProtocol.frames)
       {
-        drawFrame(xSpreadsheet, bdmFrame);
+        drawFrame(xSpreadsheet, bdmFrame, bdmProtocol.m_minFrameSize.getValue() * 8);
 
         m_line += 2;
       }
@@ -221,7 +221,7 @@ public class ProtocolLayoutGenerator
             | WrappedTargetException | BdmException e) {}
   }
 
-  protected void drawFrame(XSpreadsheet xSpreadsheet, BdmFrame bdmFrame) throws BdmException, IndexOutOfBoundsException, IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException
+  protected void drawFrame(XSpreadsheet xSpreadsheet, BdmFrame bdmFrame, int minFrameSize) throws BdmException, IndexOutOfBoundsException, IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException
   {
     int currentShift;
     int byteIndex;
@@ -376,8 +376,7 @@ public class ProtocolLayoutGenerator
     }
 
     /* Fixed-size frames */
-    // TODO Add configuration knob
-    while(currentShift < 64)
+    while(currentShift < minFrameSize)
     {
       /* Octet number */
       if(bitIndex == 0)

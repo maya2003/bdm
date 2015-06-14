@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, 2014 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
    See the file COPYING for copying permission.
 
    https://sourceforge.net/projects/bdm-generator/
@@ -13,10 +13,11 @@ public class BdmProtocol
 {
   public static final String PROTOCOL_MARKER = "Protocol";
 
-  public final BdmStringAttribute m_copyrightNotice;
-  public final BdmStringAttribute m_name;
-  public final BdmStringAttribute m_frameTypeContainer;
-  public final BdmStringAttribute m_basicTypesInclude;
+  public final BdmStringAttribute  m_copyrightNotice;
+  public final BdmStringAttribute  m_name;
+  public final BdmStringAttribute  m_frameTypeContainer;
+  public final BdmStringAttribute  m_basicTypesInclude;
+  public final BdmIntegerAttribute m_minFrameSize;
 
   public final List<BdmFrame>     frames;
 
@@ -26,6 +27,7 @@ public class BdmProtocol
     m_name               = new BdmStringAttribute("name",               false, false, "",   null, null);
     m_frameTypeContainer = new BdmStringAttribute("frameTypeContainer", false, true,  "u8", null, null);
     m_basicTypesInclude  = new BdmStringAttribute("basicTypesInclude",  false, false, "",   null, null);
+    m_minFrameSize       = new BdmIntegerAttribute("minFrameSize",      false, true,  0,    null, null);
 
     frames = new ArrayList<BdmFrame>();
   }
