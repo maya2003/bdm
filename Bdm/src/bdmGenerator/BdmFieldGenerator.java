@@ -120,7 +120,7 @@ public class BdmFieldGenerator
       s.append("    default:\n" +
                "    {\n" +
                "      /* field invalid */\n" +
-               "      valid = false;\n" +
+               "      //valid = false;\n" +
                "      break;\n" +
                "    }\n");
 
@@ -137,7 +137,7 @@ public class BdmFieldGenerator
     m_notAvailableValues.appendCheckRange(s, getFullName(), "    /* The field is valid, do nothing. */\n");
 
     /* Valid values */
-    m_validValues.appendCheckRange(s, getFullName(),        "    /* The field is valid, do nothing. */\n");
+    m_validValues.appendCheckRange(s, getFullName(),        "    /* The field is invalid! */\n    valid = false;\n");
   }
 
 }

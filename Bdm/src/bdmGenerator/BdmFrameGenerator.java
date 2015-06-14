@@ -289,7 +289,7 @@ public class BdmFrameGenerator
       s.append("  if("); s.append(this.getName()); s.append("->spare"); s.append(spare + 1); s.append(" != " + "0x"); s.append(Integer.toHexString(check).toUpperCase()); s.append(")\n" +
                "  {\n" +
                "    /* spare invalid */\n" +
-               "    //valid = false;\n" +
+               "    valid = false;\n" +
                "  }\n\n");
     }
   }
