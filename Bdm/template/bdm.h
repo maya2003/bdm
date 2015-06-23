@@ -4,9 +4,17 @@
    https://sourceforge.net/projects/bdm-generator/
 */
 
+#ifndef __BDM_H__
+#define __BDM_H__
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif /* __cplusplus */
 
 typedef  uint8_t  u8;
 typedef uint16_t u16;
@@ -143,4 +151,10 @@ extern bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet);
 extern bool Bdm_getFrameSize(size_t *size, u8 id);
 extern void Bdm_dumpMemory(const u8 *data, size_t size);
 extern void Bdm_dumpFrame(const Bdm_ProtocolContext *context);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
+#endif /* __BDM_H__ */
 

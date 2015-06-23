@@ -76,20 +76,25 @@ public class BdmProtocolGenerator
 
   public void createHeaderFile() throws IOException, BdmException
   {
-    Writer writer = m_bdmFileGenerator.getFile(m_fileName + ".h");
+    Writer writer = m_bdmFileGenerator.getFile(getFileName() + "_frames.h");
     appendHeader(writer);
-    writer.append(m_bdmProtocol.m_basicTypesInclude.getValue()); writer.append("\n");
-    writer.append('\n');
+    writer.append("#ifndef __"); writer.append(getNameUpper()); writer.append("_FRAMES_H__\n");
+    writer.append("#define __"); writer.append(getNameUpper()); writer.append("_FRAMES_H__\n\n");
+    //TODO: If not empty
+    writer.append(m_bdmProtocol.m_basicTypesInclude.getValue()); writer.append("\n\n");
+    writer.append("#include \"bdm.h\"\n\n#ifdef __cplusplus\nextern \"C\"\n{\n#endif /* __cplusplus */\n\n");
     appendFrameStructureDefinition(writer);
     appendFrameIdDefinition(writer);
     appendFieldEnumsDefinition(writer);
     appendMethodsDeclaration(writer);
+    writer.append("#ifdef __cplusplus\n}\n#endif /* __cplusplus */\n\n");
+    writer.append("#endif /* __"); writer.append(getNameUpper()); writer.append("_FRAMES_H__ */\n\n");
     writer.close();
   }
 
   public void createImplementationFile() throws IOException
   {
-    Writer writer = m_bdmFileGenerator.getFile(m_fileName + ".c");
+    Writer writer = m_bdmFileGenerator.getFile(getFileName() + "_frames.c");
     appendHeader(writer);
     writer.append("#include \""); writer.append(m_fileName); writer.append(".h\"\n");
     writer.append('\n');
