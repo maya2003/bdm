@@ -39,6 +39,7 @@ public class BdmProtocolGenerator
 
     m_bdmMethodGenerator = new BdmMethodGenerator("void", new StringBuilder(getNameUpperCamel())
       .append("_frameReceived").toString());
+    m_bdmMethodGenerator.addParameter("Bdm_ProtocolContext *", "context");
     m_bdmMethodGenerator.addParameter(bdmProtocol.m_frameTypeContainer.getValue(), "frameId");
     m_bdmMethodGenerator.addParameter("u8 *", "frame");
 

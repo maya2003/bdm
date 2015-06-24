@@ -10,6 +10,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+class Parameter
+{
+  String name;
+  boolean cast;
+
+  public Parameter(String name, boolean cast)
+  {
+    this.name = name;
+    this.cast = cast;
+  }
+
+}
+
 public class BdmMethodGenerator
 {
   protected String m_returnType;
@@ -96,7 +109,7 @@ public class BdmMethodGenerator
     s.append(")\n");
   }
 
-  public void appendMethodCall(StringBuilder s, String[] parameters, boolean cast)
+  public void appendMethodCall(StringBuilder s, Parameter[] parameters)
   {
     boolean first = true;
 
@@ -105,21 +118,21 @@ public class BdmMethodGenerator
     
     Iterator<BdmMethodParameter> it = m_parameters.iterator();
     
-    for(String parameter: parameters)
+    for(Parameter parameter: parameters)
     {
       if(!first)
       {
         s.append(", ");
       }
 
-      if(cast)
+      if(parameter.cast)
       {
         s.append("(");
         s.append(it.next().m_type);
         s.append(")");
       }
 
-      s.append(parameter);
+      s.append(parameter.name);
 
       first = false;
     }

@@ -53,7 +53,8 @@ public class BdmFrameGenerator
       .append(bdmProtocolGenerator.getNameUpperCamel())
       .append("_manage")
       .append(getNameUpperCamel())
-      .append("Frame").toString()); 
+      .append("Frame").toString());
+    m_bdmMethodGenerator.addParameter("Bdm_ProtocolContext *", "context");
     m_bdmMethodGenerator.addParameter(getType() + " *", getName());
 
     bdmFieldGenerators = new ArrayList<BdmFieldGenerator>();
@@ -237,7 +238,7 @@ public class BdmFrameGenerator
     s.append("    {\n" +
              "      /* Manage frame */\n" +
              "      ");
-    m_bdmMethodGenerator.appendMethodCall(s, new String[]{"frame"}, true);
+    m_bdmMethodGenerator.appendMethodCall(s, new Parameter[]{new Parameter("context", false), new Parameter("frame", true)});
     s.append("      break;\n" +
              "    }\n\n");
   }
