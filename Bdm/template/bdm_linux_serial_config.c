@@ -49,7 +49,7 @@ bool Bdm_serialOpen(Bdm_ProtocolContext *context)
   struct termios termios;
 
   /* Open the serial port */
-  context->fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
+  context->fd = open(context->configuration->device, O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
   if(context->fd < 0)
   {
     perror("open()");

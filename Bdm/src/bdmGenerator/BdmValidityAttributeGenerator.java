@@ -30,7 +30,7 @@ public class BdmValidityAttributeGenerator
       s.append("  ");
       s.append(new BdmCaseFormat(bdmRange.getLowerBound().getName()).toUpper());
       s.append(" = 0x");
-      s.append(bdmRange.getLowerBound().getValue());
+      s.append(Long.toHexString(bdmRange.getLowerBound().getValue()).toUpperCase());
       s.append(",\n");
 
       s.append("  ");
@@ -51,7 +51,7 @@ public class BdmValidityAttributeGenerator
         s.append(new BdmCaseFormat(enumValue.getName()).toUpper());
         s.append(" = 0x");
         // TODO: check max ranges / set limits
-        s.append(Long.toHexString(enumValue.getValue()));
+        s.append(Long.toHexString(enumValue.getValue()).toUpperCase());
         s.append(",\n");
       }
     }

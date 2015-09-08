@@ -97,7 +97,7 @@ public class BdmProtocolGenerator
   {
     Writer writer = m_bdmFileGenerator.getFile(getFileName() + "_frames.c");
     appendHeader(writer);
-    writer.append("#include \""); writer.append(m_fileName); writer.append(".h\"\n");
+    writer.append("#include \""); writer.append(m_fileName); writer.append("_frames.h\"\n");
     writer.append('\n');
     appendFrameTypeSwitchDefinition(writer);
     appendCheckFramesContent(writer);

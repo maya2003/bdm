@@ -131,6 +131,10 @@ public class BdmMethodGenerator
         s.append(it.next().m_type);
         s.append(")");
       }
+      else
+      {
+        it.next();
+      }
 
       s.append(parameter.name);
 
