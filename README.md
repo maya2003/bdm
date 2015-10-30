@@ -28,7 +28,11 @@ Copyright (c) 2013, 2014, 2015 Olivier TARTROU
 
 # Features
 
-# Planed
+See also file documentation/advertisement/advertisement.odt.
+
+
+# Planned
+
 
 # Installation
 
