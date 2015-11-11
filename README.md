@@ -15,6 +15,8 @@ Copyright (c) 2013, 2014, 2015 Olivier TARTROU
 
 ## Third-party dependencies
 
+All trademarks and registered trademarks are the property of their respective owners.
+
 * LibreOffice and LibreOffice's libraries
 * pycrc
   * https://pycrc.org/index.html
