@@ -1,12 +1,10 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package main;
-
-import java.io.Writer;
 
 import unoGenerator.ProtocolLayoutGenerator;
 import unoParser.BdmCell;
@@ -16,6 +14,7 @@ import unoParser.data.BdmDataDictionaryParser;
 import bdmGenerator.BdmFileGenerator;
 import bdmGenerator.BdmProtocolGenerator;
 import bdmGenerator.PyCrcGenerator;
+import bdmGenerator.data.BdmDataDictionaryGenerator;
 import bdmModel.BdmProtocol;
 import bdmModel.data.BdmDataDictionary;
 
@@ -40,7 +39,7 @@ public class Main
     Object desktopFrame = xComponentContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
     XComponentLoader xComponentLoader = (XComponentLoader)UnoRuntime.queryInterface(XComponentLoader.class, desktopFrame);
 
-    StringBuilder specificationPath = new StringBuilder("file://").append(System.getProperty("user.dir")).append("/Specification/Specification.ods");
+    StringBuilder specificationPath = new StringBuilder("file://").append(System.getProperty("user.dir")).append("/../documentation/input/specification.ods");
     System.out.print("Opening specification spreadsheet: ");
     System.out.print(specificationPath);
     System.out.println("...");
@@ -55,12 +54,12 @@ public class Main
       /* Get the sheet */
       XSpreadsheets xSpreadsheets = xSpreadsheetDocument.getSheets();
       XIndexAccess xIndexAccess = (XIndexAccess)UnoRuntime.queryInterface(XIndexAccess.class, xSpreadsheets);
-      XSpreadsheet xSpreadsheet1 = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(1));
+      XSpreadsheet xSpreadsheet1 = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(2));
       XSpreadsheet xSpreadsheet2 = (XSpreadsheet)UnoRuntime.queryInterface(XSpreadsheet.class, xIndexAccess.getByIndex(3));
 
       System.out.println("Parsing specification spreadsheet...");
       BdmProtocol bdmProtocol = new BdmProtocol();
-      BdmCell bdmCell = new BdmCell(xSpreadsheet1, 2, 1);
+      BdmCell bdmCell = new BdmCell(xSpreadsheet1, 1, 1);
       BdmProtocolParser bdmProtocolParser = new BdmProtocolParser(bdmProtocol, bdmCell);
       bdmProtocolParser.parse();
 
@@ -71,18 +70,17 @@ public class Main
       bdmDataDictionaryParser.parse();
 
       System.out.println("Generating protocol...");
-      BdmFileGenerator bdmFileGenerator = new BdmFileGenerator(System.getProperty("user.dir") + "/Generated sources/");
+      BdmFileGenerator bdmFileGenerator = new BdmFileGenerator(System.getProperty("user.dir") + "/../generated_sources/");
       BdmProtocolGenerator bdmProtocolGenerator = new BdmProtocolGenerator(bdmFileGenerator, bdmProtocol);
       bdmProtocolGenerator.createHeaderFile();
       bdmProtocolGenerator.createImplementationFile();
 
-      System.out.println("Generating dictionary...");
-      Writer dictionaryHeaderFile         = bdmFileGenerator.getFile("dictionary.h");
-      Writer dictionaryImplementationFile = bdmFileGenerator.getFile("dictionary.c");
-      dictionaryHeaderFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
-      dictionaryImplementationFile.append("/* <Copyright statement> */\n\n\n" + "/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
-      dictionaryHeaderFile.close();
-      dictionaryImplementationFile.close();
+      System.out.println("Generating data dictionary...");
+      BdmDataDictionaryGenerator bdmDataDictionaryGenerator = new BdmDataDictionaryGenerator(bdmFileGenerator, bdmDataDictionary);
+      bdmDataDictionaryGenerator.createHeaderFile();
+      bdmDataDictionaryGenerator.createImplementationFile();
+
+      //dictionaryHeaderFile.close();
 
       System.out.println("Generating protocol layout...");
       ProtocolLayoutGenerator protocolLayoutGenerator = new ProtocolLayoutGenerator(xSpreadsheetDocument);
@@ -101,3 +99,4 @@ public class Main
   }
 
 }
+
