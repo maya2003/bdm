@@ -1,7 +1,7 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package bdmGenerator;
@@ -24,7 +24,8 @@ public class BdmProtocolGenerator
   protected final String m_nameUpperCamel;
   protected final String m_fullNameUpper;
 
-  protected BdmMethodGenerator m_bdmMethodGenerator;
+  protected BdmMethodGenerator m_getFrameSizeMethod;
+  protected BdmMethodGenerator m_frameTypeSwitchMethod;
   protected final List<BdmFrameGenerator> bdmFrameGenerators;
 
   public BdmProtocolGenerator(BdmFileGenerator bdmFileGenerator, BdmProtocol bdmProtocol)
@@ -37,11 +38,16 @@ public class BdmProtocolGenerator
     m_nameUpperCamel = bdmCaseFormat.toUpperCamel();
     m_fullNameUpper  = bdmCaseFormat.toUpper();
 
-    m_bdmMethodGenerator = new BdmMethodGenerator("void", new StringBuilder(getNameUpperCamel())
+    m_getFrameSizeMethod = new BdmMethodGenerator("bool", new StringBuilder(getNameUpperCamel())
+      .append("_getFrameSize").toString());
+    m_getFrameSizeMethod.addParameter("size_t *", "size");
+    m_getFrameSizeMethod.addParameter("u8", "frameId");
+
+    m_frameTypeSwitchMethod = new BdmMethodGenerator("void", new StringBuilder(getNameUpperCamel())
       .append("_frameReceived").toString());
-    m_bdmMethodGenerator.addParameter("Bdm_ProtocolContext *", "context");
-    m_bdmMethodGenerator.addParameter(bdmProtocol.m_frameTypeContainer.getValue(), "frameId");
-    m_bdmMethodGenerator.addParameter("u8 *", "frame");
+    m_frameTypeSwitchMethod.addParameter("Bdm_ProtocolContext *", "context");
+    m_frameTypeSwitchMethod.addParameter(bdmProtocol.m_frameTypeContainer.getValue(), "frameId");
+    m_frameTypeSwitchMethod.addParameter("u8 *", "frame");
 
     bdmFrameGenerators = new ArrayList<BdmFrameGenerator>();
     for(BdmFrame bdmFrame: m_bdmProtocol.frames)
@@ -82,7 +88,6 @@ public class BdmProtocolGenerator
     writer.append("#ifndef __"); writer.append(getNameUpper()); writer.append("_FRAMES_H__\n");
     writer.append("#define __"); writer.append(getNameUpper()); writer.append("_FRAMES_H__\n\n");
     //TODO: If not empty
-    writer.append(m_bdmProtocol.m_basicTypesInclude.getValue()); writer.append("\n\n");
     writer.append("#include \"bdm.h\"\n\n#ifdef __cplusplus\nextern \"C\"\n{\n#endif /* __cplusplus */\n\n");
     appendFrameStructureDefinition(writer);
     appendFrameIdDefinition(writer);
@@ -97,10 +102,11 @@ public class BdmProtocolGenerator
   {
     Writer writer = m_bdmFileGenerator.getFile(getFileName() + "_frames.c");
     appendHeader(writer);
-    writer.append("#include \""); writer.append(m_fileName); writer.append("_frames.h\"\n");
-    writer.append('\n');
+    writer.append("#include \""); writer.append(m_fileName); writer.append("_frames.h\"\n\n");
+    appendFrameSizes(writer);
     appendFrameTypeSwitchDefinition(writer);
     appendCheckFramesContent(writer);
+    appendBuildFrames(writer);
     writer.close();
   }
 
@@ -165,11 +171,45 @@ public class BdmProtocolGenerator
   {
     StringBuilder s = new StringBuilder();
 
-    m_bdmMethodGenerator.appendMethodDeclaration(s);
+    m_frameTypeSwitchMethod.appendMethodDeclaration(s);
+
     for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
     {
       bdmFrameGenerator.appendFrameCheckContentDeclaration(s);
     }
+
+    for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
+    {
+      bdmFrameGenerator.appendSendFrameDeclaration(s);
+    }
+
+    writer.append(s.toString());
+  }
+
+  public void appendFrameSizes(Writer writer) throws IOException
+  {
+    StringBuilder s = new StringBuilder();
+
+    m_getFrameSizeMethod.appendMethodDefinition(s);
+    s.append("{\n" +
+        "  switch(frameId)\n" +
+        "  {\n");
+
+    for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
+    {
+      bdmFrameGenerator.appendFrameSize(s);
+    }
+
+    s.append("    default:\n" +
+      "    {\n" +
+      "      /* Unknown frameId! */\n" +
+      "      return false;\n" +
+      "      break;\n" +
+      "    }\n" +
+      "  }\n" +
+      "\n" +
+      "  return true;\n" +
+      "}\n\n");
 
     writer.append(s.toString());
   }
@@ -178,7 +218,7 @@ public class BdmProtocolGenerator
   {
     StringBuilder s = new StringBuilder();
 
-    m_bdmMethodGenerator.appendMethodDefinition(s);
+    m_frameTypeSwitchMethod.appendMethodDefinition(s);
     s.append("{\n" +
              "  switch(frameId)\n" +
              "  {\n");
@@ -208,6 +248,18 @@ public class BdmProtocolGenerator
     for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
     {
       bdmFrameGenerator.appendCheckFrameContent(s);
+    }
+
+    writer.append(s.toString());
+  }
+
+  public void appendBuildFrames(Writer writer) throws IOException
+  {
+    StringBuilder s = new StringBuilder();
+
+    for(BdmFrameGenerator bdmFrameGenerator: bdmFrameGenerators)
+    {
+      bdmFrameGenerator.appendSendFrame(s);
     }
 
     writer.append(s.toString());

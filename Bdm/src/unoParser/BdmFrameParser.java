@@ -1,7 +1,7 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package unoParser;
@@ -21,8 +21,10 @@ public class BdmFrameParser
   protected BdmFrame m_bdmFrame;
   protected BdmCell  m_bdmCell;
 
-  protected final BdmStringAttributeParser  m_name;
-  protected final BdmIntegerAttributeParser m_id;
+  protected final BdmStringAttributeParser   m_name;
+  protected final BdmIntegerAttributeParser  m_id;
+  protected final BdmValidityAttributeParser m_transmitters;
+  protected final BdmValidityAttributeParser m_receivers;
 
   public static boolean isFrame(BdmCell bdmCell) throws IndexOutOfBoundsException
   {
@@ -34,8 +36,10 @@ public class BdmFrameParser
     m_bdmFrame = bdmFrame;
     m_bdmCell  = bdmCell;
 
-    m_name = new BdmStringAttributeParser (bdmFrame.m_name, bdmCell.getCell(3, 1), bdmCell.getCell());
-    m_id   = new BdmIntegerAttributeParser(bdmFrame.m_id,   bdmCell.getCell(0, 2), bdmCell.getCell());
+    m_name         = new BdmStringAttributeParser ( bdmFrame.m_name,         bdmCell.getCell( 3, 1), bdmCell.getCell());
+    m_id           = new BdmIntegerAttributeParser( bdmFrame.m_id,           bdmCell.getCell( 0, 2), bdmCell.getCell());
+    m_transmitters = new BdmValidityAttributeParser(bdmFrame.m_transmitters, bdmCell.getCell(-2, 2), bdmCell.getCell());
+    m_receivers    = new BdmValidityAttributeParser(bdmFrame.m_receivers,    bdmCell.getCell( 2, 0), bdmCell.getCell());
   }
 
   public void parse() throws BdmException, IndexOutOfBoundsException
@@ -47,8 +51,10 @@ public class BdmFrameParser
     System.out.print("  ");
     System.out.println(((BdmStringAttribute)m_name.m_bdmAttribute).getValue());
     m_id.parse();
+    m_transmitters.parse();
+    m_receivers.parse();
 
-    m_bdmCell.getCell(3, -3);
+    m_bdmCell.getCell(3, -5);
 
     try
     {

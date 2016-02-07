@@ -1,7 +1,7 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package bdmGenerator;
@@ -94,7 +94,7 @@ public class BdmFieldGenerator
   }
 
 
-  public void appendCheckFieldsBounds(StringBuilder s)
+  public void appendCheckFieldBounds(StringBuilder s)
   {
     if(
         (!m_errorValues.m_bdmValidityAttribute.isNull())
@@ -138,6 +138,17 @@ public class BdmFieldGenerator
 
     /* Valid values */
     m_validValues.appendCheckRange(s, getFullName(),        "    /* The field is invalid! */\n    valid = false;\n");
+  }
+
+  /*
+   */
+  public void appendFillField(StringBuilder s)
+  {
+    s.append("  ");
+    s.append(getFullName());
+    s.append(" = ");
+    s.append(getName());
+    s.append(";\n");
   }
 
 }

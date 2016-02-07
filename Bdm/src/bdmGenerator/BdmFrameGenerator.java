@@ -1,7 +1,7 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package bdmGenerator;
@@ -25,6 +25,7 @@ public class BdmFrameGenerator
   protected final List<Integer> m_spare;
 
   protected BdmMethodGenerator m_bdmMethodGenerator;
+  protected BdmMethodGenerator m_bdmSendMethodGenerator;
   protected final List<BdmFieldGenerator> bdmFieldGenerators;
 
   public BdmFrameGenerator(BdmProtocolGenerator bdmProtocolGenerator, BdmFrame bdmFrame)
@@ -55,7 +56,21 @@ public class BdmFrameGenerator
       .append(getNameUpperCamel())
       .append("Frame").toString());
     m_bdmMethodGenerator.addParameter("Bdm_ProtocolContext *", "context");
-    m_bdmMethodGenerator.addParameter(getType() + " *", getName());
+    if(!m_bdmFrame.fields.isEmpty())
+    {
+      m_bdmMethodGenerator.addParameter(getType() + " *", getName());
+    }
+
+    m_bdmSendMethodGenerator = new BdmMethodGenerator("bool", new StringBuilder()
+      .append(bdmProtocolGenerator.getNameUpperCamel())
+      .append("_send")
+      .append(getNameUpperCamel())
+      .append("Frame").toString());
+    m_bdmSendMethodGenerator.addParameter("Bdm_ProtocolContext *", "context");
+    for(BdmField bdmField: m_bdmFrame.fields)
+    {
+      m_bdmSendMethodGenerator.addParameter(bdmField.m_type.getValue(), bdmField.m_name.getValue());
+    }
 
     bdmFieldGenerators = new ArrayList<BdmFieldGenerator>();
     for(BdmField bdmField: m_bdmFrame.fields)
@@ -97,6 +112,12 @@ public class BdmFrameGenerator
 
   public void appendFrameStructureDefinition(StringBuilder s) throws BdmException
   {
+    if(bdmFieldGenerators.isEmpty())
+    {
+      s.append("/* (struct "); s.append(getType()); s.append(" is empty.) */\n\n");
+      return;
+    }
+
     BdmSpacer leftmargin = new BdmSpacer(2);
     BdmSpacer type       = new BdmSpacer(1);
     BdmSpacer name       = new BdmSpacer(1);
@@ -232,13 +253,29 @@ public class BdmFrameGenerator
     }
   }
 
+  public void appendFrameSize(StringBuilder s)
+  {
+    s.append("    case ");
+    s.append(getFullNameUpper());
+    s.append(":\n    {\n      *size = sizeof(");
+    s.append(getType());
+    s.append(");\n      break;\n    }\n\n");
+  }
+
   public void appendFrameTypeCase(StringBuilder s)
   {
     s.append("    case "); s.append(getFullNameUpper()); s.append(":\n");
     s.append("    {\n" +
              "      /* Manage frame */\n" +
              "      ");
-    m_bdmMethodGenerator.appendMethodCall(s, new Parameter[]{new Parameter("context", false), new Parameter("frame", true)});
+    if(!m_bdmFrame.fields.isEmpty())
+    {
+      m_bdmMethodGenerator.appendMethodCall(s, new Parameter[]{new Parameter("context", false), new Parameter("frame", true)});
+    }
+    else
+    {
+      m_bdmMethodGenerator.appendMethodCall(s, new Parameter[]{new Parameter("context", false)});
+    }
     s.append("      break;\n" +
              "    }\n\n");
   }
@@ -246,6 +283,11 @@ public class BdmFrameGenerator
   public void appendFrameCheckContentDeclaration(StringBuilder s)
   {
     m_bdmMethodGenerator.appendMethodDeclaration(s);
+  }
+
+  public void appendSendFrameDeclaration(StringBuilder s)
+  {
+    m_bdmSendMethodGenerator.appendMethodDeclaration(s);
   }
 
   public void appendCheckFrameContent(StringBuilder s)
@@ -270,7 +312,7 @@ public class BdmFrameGenerator
 
     for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
     {
-      bdmFieldGenerator.appendCheckFieldsBounds(s);
+      bdmFieldGenerator.appendCheckFieldBounds(s);
     }
   }
 
@@ -332,4 +374,19 @@ public class BdmFrameGenerator
 
     s.append("  }\n");
   }
+
+  public void appendSendFrame(StringBuilder s)
+  {
+    m_bdmSendMethodGenerator.appendMethodDefinition(s);
+    s.append("{\n");
+    s.append("  "); s.append(getType()); s.append(' '); s.append(getName()); s.append(";\n\n");
+    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+    {
+      bdmFieldGenerator.appendFillField(s);
+    }
+
+    s.append("\n  return Bdm_protocolSendFrame(context, "); s.append(getFullNameUpper()); s.append(", &"); s.append(getName()); s.append(", sizeof(");  s.append(getName()); s.append("));\n}\n\n");
+  }
+
 }
+
