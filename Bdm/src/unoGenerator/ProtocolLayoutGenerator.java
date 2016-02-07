@@ -1,7 +1,7 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
    See the file COPYING for copying permission.
 
-   https://sourceforge.net/projects/bdm-generator/
+   https://github.com/maya2003/bdm
 */
 
 package unoGenerator;
@@ -80,9 +80,9 @@ public class ProtocolLayoutGenerator
   protected static final String FIELD_STYLE         = "Field";
 
   protected XSpreadsheetDocument m_xSpreadsheetDocument;
-  protected XNameContainer m_cellStyleNameContainer;
+  protected XNameContainer       m_cellStyleNameContainer;
 
-  protected static final int m_column = 9;
+  protected static final int m_column = 15;
   protected int m_line;
 
   public ProtocolLayoutGenerator(XSpreadsheetDocument xSpreadsheetDocument) throws IllegalArgumentException, ElementExistException, UnknownPropertyException, PropertyVetoException, Exception
@@ -91,8 +91,8 @@ public class ProtocolLayoutGenerator
 
     /* Get the list of cell styles */
     XNameAccess styleFamilies = UnoRuntime.queryInterface(XStyleFamiliesSupplier.class, m_xSpreadsheetDocument).getStyleFamilies();
-    XNameAccess cellStyles = UnoRuntime.queryInterface(XNameAccess.class, styleFamilies.getByName("CellStyles"));
-    m_cellStyleNameContainer = UnoRuntime.queryInterface(XNameContainer.class, cellStyles);
+    XNameAccess cellStyles    = UnoRuntime.queryInterface(XNameAccess.class, styleFamilies.getByName("CellStyles"));
+    m_cellStyleNameContainer  = UnoRuntime.queryInterface(XNameContainer.class, cellStyles);
 
     /* Delete the previous styles */
     deleteStyles();
@@ -207,7 +207,18 @@ public class ProtocolLayoutGenerator
   {
     try
     {
-      m_line = 11;
+      /* header */
+      XCell xCell = xSpreadsheet.getCellByPosition(m_column, 0);
+      xCell.setFormula("octet #");
+      UnoRuntime.queryInterface(XPropertySet.class, xCell).setPropertyValue("HoriJustify", CellHoriJustify.RIGHT);
+
+      /* header */
+      xSpreadsheet.getCellByPosition(m_column + 1, 0).setFormula("bit #");
+      XCellRange xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1, 0, m_column + 8, 0);
+      UnoRuntime.queryInterface(XPropertySet.class, xCellRange).setPropertyValue("CellStyle", BIT_HEADING_STYLE);
+      UnoRuntime.queryInterface(XMergeable.class, xCellRange).merge(true);
+
+      m_line = 16; /* first line to draw */
 
       for(BdmFrame bdmFrame: bdmProtocol.frames)
       {
@@ -240,7 +251,7 @@ public class ProtocolLayoutGenerator
     xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1, m_line, m_column + 8, m_line);
     UnoRuntime.queryInterface(XPropertySet.class, xCellRange).setPropertyValue("CellStyle", BIT_HEADING_STYLE);
 
-    for(int i = 0; i <= 7; i++)
+    for(int i = 0; i < 8; i++)
     {
       xSpreadsheet.getCellByPosition(m_column + 1 + i, m_line).setValue(i);
     }
