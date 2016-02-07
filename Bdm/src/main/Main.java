@@ -6,6 +6,7 @@
 
 package main;
 
+import unoGenerator.DataDictionaryGenerator;
 import unoGenerator.ProtocolLayoutGenerator;
 import unoParser.BdmCell;
 import unoParser.BdmProtocolParser;
@@ -63,6 +64,10 @@ public class Main
       BdmProtocolParser bdmProtocolParser = new BdmProtocolParser(bdmProtocol, bdmCell);
       bdmProtocolParser.parse();
 
+      System.out.println("Generating sample data dictionary...");
+      DataDictionaryGenerator dataDictionaryGenerator = new DataDictionaryGenerator(xSpreadsheetDocument);
+      dataDictionaryGenerator.fill(xSpreadsheet2, bdmProtocol);
+
       System.out.println("Parsing data dictionary spreadsheet...");
       BdmDataDictionary bdmDataDictionary = new BdmDataDictionary();
       bdmCell = new BdmCell(xSpreadsheet2, 3, 0);
@@ -99,4 +104,3 @@ public class Main
   }
 
 }
-
