@@ -5,7 +5,7 @@ Code generator for generic communication protocol
 
 # Licenses
 
-Copyright (c) 2013, 2014, 2015 Olivier TARTROU
+Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
 
 * protocol template: creative commons Attribution 4.0 International (CC BY 4.0)
 * code generator:    MIT license
