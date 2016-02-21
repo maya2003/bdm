@@ -1,8 +1,8 @@
 /* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
-   See the file COPYING for copying permission.
-
-   https://github.com/maya2003/bdm
-*/
+ * See the file COPYING for copying permission.
+ *
+ * https://github.com/maya2003/bdm
+ */
 
 package bdmGenerator;
 
@@ -115,7 +115,7 @@ public class BdmProtocolGenerator
     StringBuilder s = new StringBuilder();
 
     s.append(m_bdmProtocol.m_copyrightNotice.getValue());
-    s.append("\n\n/* This file has been generated using the BDM generator – https://sourceforge.net/projects/bdm-generator/. */\n\n");
+    s.append("\n\n/* This file has been generated using the BDM generator – https://github.com/maya2003/bdm */\n\n");
 
     writer.append(s.toString());
   }

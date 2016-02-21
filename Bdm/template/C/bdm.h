@@ -1,8 +1,8 @@
-/* Copyright (c) 2013, 2014, 2015 Olivier TARTROU
-   See the file COPYING for copying permission.
-
-   https://sourceforge.net/projects/bdm-generator/
-*/
+/* Copyright (c) 2013, 2014, 2015, 2016 Olivier TARTROU
+ * See the file COPYING for copying permission.
+ *
+ * https://github.com/maya2003/bdm
+ */
 
 #ifndef __BDM_H__
 #define __BDM_H__
@@ -16,8 +16,11 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+typedef   int8_t  s8;
 typedef  uint8_t  u8;
+typedef  int16_t s16;
 typedef uint16_t u16;
+typedef  int32_t s32;
 typedef uint32_t u32;
 
 typedef enum
