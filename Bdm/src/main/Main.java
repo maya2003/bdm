@@ -6,18 +6,15 @@
 
 package main;
 
-import unoGenerator.DataDictionaryGenerator;
-import unoGenerator.ProtocolLayoutGenerator;
-import unoParser.BdmCell;
-import unoParser.BdmProtocolParser;
-import unoParser.data.BdmDataDictionaryParser;
+import protocol.data_dictionary.generator.DataDictionaryGenerator;
+import protocol.generator.BdmFileGenerator;
+import protocol.generator.BdmProtocolGenerator;
+import protocol.generator.PyCrcGenerator;
+import protocol.layout.generator.ProtocolLayoutGenerator;
+import protocol.model.BdmProtocol;
+import protocol.parser.BdmCell;
+import protocol.parser.BdmProtocolParser;
 
-import bdmGenerator.BdmFileGenerator;
-import bdmGenerator.BdmProtocolGenerator;
-import bdmGenerator.PyCrcGenerator;
-import bdmGenerator.data.BdmDataDictionaryGenerator;
-import bdmModel.BdmProtocol;
-import bdmModel.data.BdmDataDictionary;
 
 import com.sun.star.sheet.XSpreadsheet;
 import com.sun.star.sheet.XSpreadsheetDocument;
@@ -28,6 +25,10 @@ import com.sun.star.beans.PropertyValue;
 import com.sun.star.container.XIndexAccess;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XModel;
+
+import data_dictionary.generator.BdmDataDictionaryGenerator;
+import data_dictionary.model.BdmDataDictionary;
+import data_dictionary.parser.BdmDataDictionaryParser;
 
 public class Main
 {
