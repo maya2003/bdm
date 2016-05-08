@@ -22,6 +22,7 @@
 // TODO: direction control and signalisation
 // TODO: external IO for direction control and signalisation
 // TODO: publish IO + inverted logic
+// TODO: set errno?
 /* TODO:
 - tcsendbreak()
 - tcdrain()
@@ -31,7 +32,6 @@
 */
 
 #define _BSD_SOURCE
-#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -39,29 +39,30 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "bdm.h"
+#include "bdm_serial.h"
 
 /*
  */
-bool Bdm_serialOpen(Bdm_ProtocolContext *context)
+int Bdm_serialOpen(const char *deviceName, const Bdm_SerialConfiguration *configuration)
 {
+  int fd;
   int result;
   struct termios termios;
 
   /* Open the serial port */
-  context->fd = open(context->configuration->device, O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
-  if(context->fd < 0)
+  fd = open(deviceName, O_RDWR | O_NOCTTY); // TODO: O_NOATIME, O_NOCTTY, O_SYNC ??
+  if(fd < 0)
   {
     perror("open()");
-    return false;
+    return -1;
   }
 
   /* Get the current configuration */
-  result = tcgetattr(context->fd, &termios);
+  result = tcgetattr(fd, &termios);
   if(result != 0)
   {
     perror("tcgetattr()");
-    return false;
+    return -1;
   }
 
   /* Update the configuration */
@@ -159,7 +160,7 @@ bool Bdm_serialOpen(Bdm_ProtocolContext *context)
   if(result != 0)
   {
     perror("cfsetispeed()");
-    return false;
+    return -1;
   }
 
   /* output speed */
@@ -167,17 +168,17 @@ bool Bdm_serialOpen(Bdm_ProtocolContext *context)
   if(result != 0)
   {
     perror("cfsetospeed()");
-    return false;
+    return -1;
   }
 
   /* Set the new configuration */
-  result = tcsetattr(context->fd, TCSAFLUSH, &termios);
+  result = tcsetattr(fd, TCSAFLUSH, &termios);
   if(result != 0)
   {
     perror("tcsetattr()");
-    return false;
+    return -1;
   }
 
-  return true;
+  return fd;
 }
 

@@ -23,7 +23,7 @@ bool Bdm_protocolInit(Bdm_ProtocolContext *context)
 
 /*
  */
-bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, size_t size)
+bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const void *data, size_t size)
 {
   bool result;
   size_t frameSize;

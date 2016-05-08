@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "bdm_serial.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -136,7 +138,6 @@ typedef struct
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-extern bool Bdm_serialOpen(Bdm_ProtocolContext *context);
 extern bool Bdm_linuxReceiveThreadStart(Bdm_ProtocolContext *context);
 extern bool Bdm_startFrame(const Bdm_ProtocolContext *context, u8 data);
 extern bool Bdm_appendData(const Bdm_ProtocolContext *context, u8 data);
@@ -147,7 +148,7 @@ extern bool Bdm_transparencySendEtx(const Bdm_ProtocolContext *context);
 extern bool Bdm_transparencySendData(const Bdm_ProtocolContext *context, const u8 *data, size_t size);
 extern bool Bdm_transparencyOctetReceived(Bdm_ProtocolContext *context, u8 octet);
 extern bool Bdm_protocolInit(Bdm_ProtocolContext *context);
-extern bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const u8 *data, size_t size);
+extern bool Bdm_protocolSendFrame(Bdm_ProtocolContext *context, u8 id, const void *data, size_t size);
 extern bool Bdm_protocolStartOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolEndOfFrameReceived(Bdm_ProtocolContext *context);
 extern bool Bdm_protocolOctetReceived(Bdm_ProtocolContext *context, u8 octet);

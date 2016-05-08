@@ -16,6 +16,17 @@
  */
 int main(void)
 {
+  const Bdm_SerialConfiguration serialConfiguration =
+  {
+    speed:           9600,
+    dataBits:        BDM_8_DATA_BITS,
+    parity:          BDM_PARITY_EVEN,
+    stopBits:        BDM_1_STOP_BIT,
+    flowControl:     BDM_FLOW_CONTROL_NONE,
+    dtrInitialState: BDM_PIN_UNSET,
+    rtsInitialState: BDM_PIN_UNSET
+  };
+
   static const Bdm_ProtocolConfiguration protocolConfiguration =
   {
     device: "/dev/ttyUSB0"
@@ -53,7 +64,7 @@ int main(void)
   u8 frame1[] = {BDM_STX, BDM_STX, BDM_STX, 0, 1, 2, 3, 0xFF, 4, BDM_DLE, 1, BDM_DLE, BDM_STX, BDM_DLE, BDM_ETX, BDM_DLE, BDM_DLE, 5, 7, BDM_DLE};
   u8 frame2[] = {};
 
-  Bdm_serialOpen(&protocolContext);
+  protocolContext.fd = Bdm_serialOpen("/dev/ttyUSB0", &serialConfiguration);
 
   Bdm_linuxReceiveThreadStart(&protocolContext);
 
