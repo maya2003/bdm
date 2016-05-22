@@ -14,6 +14,9 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+#define BDM_XON  0x11
+#define BDM_XOFF 0x13
+
 typedef uint32_t u32;
 
 typedef enum
@@ -38,7 +41,7 @@ typedef enum
 {
   BDM_1_STOP_BIT  = 1,
   BDM_2_STOP_BITS = 2
-} Bdm_SeriaStopBits;
+} Bdm_SerialStopBits;
 
 typedef enum
 {
@@ -48,6 +51,15 @@ typedef enum
   BDM_FLOW_CONTROL_XON_XOFF_RTS_CTS
 } Bdm_SerialFlowControl;
 
+typedef struct
+{
+  u32                   speed;
+  Bdm_SerialDataBits    dataBits;
+  Bdm_SerialParity      parity;
+  Bdm_SerialStopBits    stopBits;
+  Bdm_SerialFlowControl flowControl;
+} Bdm_SerialConfiguration;
+
 typedef enum
 {
   BDM_PIN_INACTIVE,
@@ -55,18 +67,7 @@ typedef enum
   BDM_PIN_UNSET
 } Bdm_SerialPinState;
 
-typedef struct
-{
-  u32                   speed;
-  Bdm_SerialDataBits    dataBits;
-  Bdm_SerialParity      parity;
-  Bdm_SeriaStopBits     stopBits;
-  Bdm_SerialFlowControl flowControl;
-  Bdm_SerialPinState    dtrInitialState;
-  Bdm_SerialPinState    rtsInitialState;
-} Bdm_SerialConfiguration;
-
-extern int Bdm_serialOpen(const char *deviceName, const Bdm_SerialConfiguration *configuration);
+extern int Bdm_serialOpen(const char *deviceName, const Bdm_SerialConfiguration *configuration, Bdm_SerialPinState dtrInitialState, Bdm_SerialPinState rtsInitialState);
 
 #ifdef __cplusplus
 }
