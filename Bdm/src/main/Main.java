@@ -15,7 +15,7 @@ import protocol.model.BdmProtocol;
 import protocol.parser.BdmCell;
 import protocol.parser.BdmProtocolParser;
 
-
+import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.sheet.XSpreadsheet;
 import com.sun.star.sheet.XSpreadsheetDocument;
 import com.sun.star.sheet.XSpreadsheets;
@@ -37,7 +37,7 @@ public class Main
     new PyCrcGenerator().createCrcFiles();
 
     System.out.println("Connecting to LibreOffice...");
-    XComponentContext xComponentContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
+    XComponentContext xComponentContext = Bootstrap.bootstrap();
     Object desktopFrame = xComponentContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
     XComponentLoader xComponentLoader = (XComponentLoader)UnoRuntime.queryInterface(XComponentLoader.class, desktopFrame);
 

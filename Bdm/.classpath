@@ -2,10 +2,15 @@
 <classpath>
 	<classpathentry excluding="fsm.editor/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="Libraries/ridl.jar"/>
-	<classpathentry kind="lib" path="Libraries/unoil.jar"/>
-	<classpathentry kind="lib" path="Libraries/juh.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/libjpipe.so">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/usr/lib/libreoffice/program/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="Libraries/guava-17.0.jar"/>
 	<classpathentry kind="lib" path="Libraries/jython-standalone-2.7-b2.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/juh.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/ridl.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/unoil.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
