@@ -18,30 +18,30 @@ import com.sun.star.lang.IndexOutOfBoundsException;
 
 public class BdmFieldParser
 {
-  protected final BdmStringAttributeParser  m_fieldMarker; // special
-  protected final BdmStringAttributeParser  m_requirementId;
-  protected final BdmStringAttributeParser  m_coveredRequirements;
-  protected final BdmStringAttributeParser  m_name;
-  protected final BdmStringAttributeParser  m_id;
-  protected final BdmIntegerAttributeParser m_index;
-  protected final BdmStringAttributeParser  m_type;
-  protected final BdmBooleanAttributeParser m_notAvailableAllowed;
-  protected final BdmStringAttributeParser  m_unit;
-  protected final BdmIntegerAttributeParser m_startByte;
-  protected final BdmIntegerAttributeParser m_startBit;
-  protected final BdmIntegerAttributeParser m_size;
-  protected final BdmValidityAttributeParser     m_errorValues;
-  protected final BdmValidityAttributeParser     m_notAvailableValues;
-  protected final BdmValidityAttributeParser     m_validValues;
-  protected final BdmIntegerAttributeParser m_offsetNumerator;
-  protected final BdmIntegerAttributeParser m_gainNumerator;
-  protected final BdmIntegerAttributeParser m_denominator;
-  protected final BdmBooleanAttributeParser m_specificConversion;
-//protected final BdmStringAttributeParser  m_realOffset; // special
-//protected final BdmStringAttributeParser  m_realGain;   // special
-  protected final BdmStringAttributeParser  m_comment;
+  protected final BdmStringAttributeParser   m_fieldMarker; // special
+  protected final BdmStringAttributeParser   m_requirementId;
+  protected final BdmStringAttributeParser   m_coveredRequirements;
+  protected final BdmStringAttributeParser   m_name;
+  protected final BdmStringAttributeParser   m_id;
+  protected final BdmIntegerAttributeParser  m_index;
+  protected final BdmStringAttributeParser   m_type;
+  protected final BdmBooleanAttributeParser  m_notAvailableAllowed;
+  protected final BdmStringAttributeParser   m_unit;
+  protected final BdmIntegerAttributeParser  m_startByte;
+  protected final BdmIntegerAttributeParser  m_startBit;
+  protected final BdmIntegerAttributeParser  m_size;
+  protected final BdmValidityAttributeParser m_errorValues;
+  protected final BdmValidityAttributeParser m_notAvailableValues;
+  protected final BdmValidityAttributeParser m_validValues;
+  protected final BdmIntegerAttributeParser  m_gainNumerator;
+  protected final BdmIntegerAttributeParser  m_offsetNumerator;
+  protected final BdmIntegerAttributeParser  m_denominator;
+  protected final BdmBooleanAttributeParser  m_specificConversion;
+//protected final BdmStringAttributeParser   m_realOffset; // special
+//protected final BdmStringAttributeParser   m_realGain;   // special
+  protected final BdmStringAttributeParser   m_comment;
 
-  protected final BdmStringAttributeParser  m_destination; // remove
+  protected final BdmStringAttributeParser   m_destination; // remove
 
   public static boolean isField(BdmCell bdmCell) throws IndexOutOfBoundsException
   {
@@ -65,8 +65,8 @@ public class BdmFieldParser
     m_errorValues         = new BdmValidityAttributeParser(bdmField.m_errorValues,         bdmCell.getCell(1, -4), bdmCell.getCell());
     m_notAvailableValues  = new BdmValidityAttributeParser(bdmField.m_notAvailableValues,  bdmCell.getCell(1,  0), bdmCell.getCell());
     m_validValues         = new BdmValidityAttributeParser(bdmField.m_validValues,         bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_offsetNumerator     = new BdmIntegerAttributeParser (bdmField.m_offsetNumerator,     bdmCell.getCell(1,  0), bdmCell.getCell());
-    m_gainNumerator       = new BdmIntegerAttributeParser (bdmField.m_gainNumerator,       bdmCell.getCell(0,  2), bdmCell.getCell());
+    m_gainNumerator       = new BdmIntegerAttributeParser (bdmField.m_gainNumerator,       bdmCell.getCell(1,  0), bdmCell.getCell());
+    m_offsetNumerator     = new BdmIntegerAttributeParser (bdmField.m_offsetNumerator,     bdmCell.getCell(0,  2), bdmCell.getCell());
     m_denominator         = new BdmIntegerAttributeParser (bdmField.m_denominator,         bdmCell.getCell(0,  2), bdmCell.getCell());
     m_specificConversion  = new BdmBooleanAttributeParser (bdmField.m_specificConversion,  bdmCell.getCell(1, -4), bdmCell.getCell());
   //m_realOffset          = new BdmStringAttributeParser  (bdmField.m_realOffset,          bdmCell.getCell(0,  2), bdmCell.getCell()); // special
