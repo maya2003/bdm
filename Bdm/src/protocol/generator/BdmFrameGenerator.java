@@ -348,7 +348,7 @@ public class BdmFrameGenerator
       s.append("    ")
        .append(bdmFieldGenerator.m_bdmField.m_destination.getValue())
        .append(" = ")
-       .append(bdmFieldGenerator.m_fullName)
+       .append(bdmFieldGenerator.m_fullNamePointer)
        .append(";\n");
     }
 
@@ -368,7 +368,7 @@ public class BdmFrameGenerator
       s.append("    printf(\"  .")
        .append(bdmFieldGenerator.getName())
        .append(": %d\\n\", ")
-       .append(bdmFieldGenerator.m_fullName)
+       .append(bdmFieldGenerator.m_fullNamePointer)
        .append(");\n");
     }
 

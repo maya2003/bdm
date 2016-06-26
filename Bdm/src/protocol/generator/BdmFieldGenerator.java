@@ -14,6 +14,7 @@ public class BdmFieldGenerator
 
   protected final String m_type;
   protected final String m_fullName;
+  protected final String m_fullNamePointer;
   protected final String m_fullNameUpper;
   protected final String m_min;
   protected final String m_max;
@@ -31,6 +32,10 @@ public class BdmFieldGenerator
     m_type = bdmCaseFormat.toUpperCamel();
 
     m_fullName = new StringBuilder(bdmFrameGenerator.getName())
+    .append(".")
+    .append(bdmCaseFormat.toLowerCamel()).toString();
+
+    m_fullNamePointer = new StringBuilder(bdmFrameGenerator.getName())
       .append("->")
       .append(bdmCaseFormat.toLowerCamel()).toString();
 
@@ -69,10 +74,16 @@ public class BdmFieldGenerator
     return m_bdmField.m_name.getValue();
   }
 
-  /** "sampleFrame->sampleField" */
+  /** "sampleFrame.sampleField" */
   public String getFullName()
   {
     return m_fullName;
+  }
+
+  /** "sampleFrame->sampleField" */
+  public String getFullNamePointer()
+  {
+    return m_fullNamePointer;
   }
 
   /** "SAMPLE_PROTOCOL_SAMPLE_FRAME_SAMPLE_FIELD" */
@@ -104,7 +115,7 @@ public class BdmFieldGenerator
         (!m_validValues.m_bdmValidityAttribute.isNull())
       )
     {
-      s.append("  switch("); s.append(getFullName()); s.append(")\n" +
+      s.append("  switch("); s.append(getFullNamePointer()); s.append(")\n" +
                "  {\n");
 
       /* Error values */
@@ -130,14 +141,14 @@ public class BdmFieldGenerator
     }
 
     /* Error values */
-    m_errorValues.appendCheckRange(s, getFullName(),        "    /* field invalid */\n" +
+    m_errorValues.appendCheckRange(s, getFullNamePointer(),        "    /* field invalid */\n" +
                                                             "    valid = false;\n");
 
     /* Not available values */
-    m_notAvailableValues.appendCheckRange(s, getFullName(), "    /* The field is valid, do nothing. */\n");
+    m_notAvailableValues.appendCheckRange(s, getFullNamePointer(), "    /* The field is valid, do nothing. */\n");
 
     /* Valid values */
-    m_validValues.appendCheckRange(s, getFullName(),        "    /* The field is invalid! */\n    valid = false;\n");
+    m_validValues.appendCheckRange(s, getFullNamePointer(),        "    /* The field is invalid! */\n    valid = false;\n");
   }
 
   /*

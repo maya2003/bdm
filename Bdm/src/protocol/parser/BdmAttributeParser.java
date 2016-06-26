@@ -96,7 +96,7 @@ public abstract class BdmAttributeParser
     m_warning = BdmFieldWarning.fwNone;
   }
 
-  public void parse() throws protocol.model.BdmException
+  public void parse() throws BdmException
   {
     m_rawValue = m_cell.getFormula();
 
