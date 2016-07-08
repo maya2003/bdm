@@ -255,11 +255,20 @@ public class BdmFrameGenerator
 
   public void appendFrameSize(StringBuilder s)
   {
-    s.append("    case ");
-    s.append(getFullNameUpper());
-    s.append(":\n    {\n      *size = sizeof(");
-    s.append(getType());
-    s.append(");\n      break;\n    }\n\n");
+    if(!m_bdmFrame.fields.isEmpty())
+    {
+      s.append("    case ");
+      s.append(getFullNameUpper());
+      s.append(":\n    {\n      *size = sizeof(");
+      s.append(getType());
+      s.append(");\n      break;\n    }\n\n");
+    }
+    else
+    {
+      s.append("    case ");
+      s.append(getFullNameUpper());
+      s.append(":\n    {\n      *size = 0;\n      break;\n    }\n\n");
+    }
   }
 
   public void appendFrameTypeCase(StringBuilder s)
@@ -379,14 +388,21 @@ public class BdmFrameGenerator
   {
     m_bdmSendMethodGenerator.appendMethodDefinition(s);
     s.append("{\n");
-    s.append("  "); s.append(getType()); s.append(' '); s.append(getName()); s.append(";\n\n");
-    for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
-    {
-      bdmFieldGenerator.appendFillField(s);
-    }
 
-    s.append("\n  return Bdm_protocolSendFrame(context, "); s.append(getFullNameUpper()); s.append(", &"); s.append(getName()); s.append(", sizeof(");  s.append(getName()); s.append("));\n}\n\n");
+    if(!m_bdmFrame.fields.isEmpty())
+    {
+      s.append("  "); s.append(getType()); s.append(' '); s.append(getName()); s.append(";\n\n");
+      for(BdmFieldGenerator bdmFieldGenerator: bdmFieldGenerators)
+      {
+        bdmFieldGenerator.appendFillField(s);
+      }
+
+      s.append("\n  return Bdm_protocolSendFrame(context, "); s.append(getFullNameUpper()); s.append(", &"); s.append(getName()); s.append(", sizeof(");  s.append(getName()); s.append("));\n}\n\n");
+    }
+    else
+    {
+      s.append("  return Bdm_protocolSendFrame(context, "); s.append(getFullNameUpper()); s.append(", NULL, 0);\n}\n\n");
+    }
   }
 
 }
-

@@ -102,6 +102,7 @@ public class BdmProtocolGenerator
   {
     Writer writer = m_bdmFileGenerator.getFile(getFileName() + "_frames.c");
     appendHeader(writer);
+    writer.append("#include <stdio.h>\n\n"); // TODO
     writer.append("#include \""); writer.append(m_fileName); writer.append("_frames.h\"\n\n");
     appendFrameSizes(writer);
     appendFrameTypeSwitchDefinition(writer);
@@ -170,6 +171,8 @@ public class BdmProtocolGenerator
   public void appendMethodsDeclaration(Writer writer) throws IOException
   {
     StringBuilder s = new StringBuilder();
+
+    m_getFrameSizeMethod.appendMethodDeclaration(s);
 
     m_frameTypeSwitchMethod.appendMethodDeclaration(s);
 
