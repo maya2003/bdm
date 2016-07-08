@@ -34,8 +34,6 @@ public class Main
 {
   public static void main(String[] args) throws Exception
   {
-    new PyCrcGenerator().createCrcFiles();
-
     System.out.println("Connecting to LibreOffice...");
     XComponentContext xComponentContext = Bootstrap.bootstrap();
     Object desktopFrame = xComponentContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
@@ -91,6 +89,9 @@ public class Main
       System.out.println("Generating protocol layout...");
       ProtocolLayoutGenerator protocolLayoutGenerator = new ProtocolLayoutGenerator(xSpreadsheetDocument);
       protocolLayoutGenerator.drawFrames(xSpreadsheet1, bdmProtocol);
+
+      System.out.println("Generating CRC generator/checker...");
+      new PyCrcGenerator().createCrcFiles();
 
       System.out.println("End.");
     }

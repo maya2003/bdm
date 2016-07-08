@@ -209,17 +209,21 @@ public class ProtocolLayoutGenerator
     try
     {
       /* header */
-      XCell xCell = xSpreadsheet.getCellByPosition(m_column, 0);
+      m_line = 1;
+
+      /* header */
+      XCell xCell = xSpreadsheet.getCellByPosition(m_column, m_line);
       xCell.setFormula("octet #");
       UnoRuntime.queryInterface(XPropertySet.class, xCell).setPropertyValue("HoriJustify", CellHoriJustify.RIGHT);
 
       /* header */
-      xSpreadsheet.getCellByPosition(m_column + 1, 0).setFormula("bit #");
-      XCellRange xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1, 0, m_column + 8, 0);
+      xSpreadsheet.getCellByPosition(m_column + 1, m_line).setFormula("bit #");
+      XCellRange xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1, m_line, m_column + 8, m_line);
       UnoRuntime.queryInterface(XPropertySet.class, xCellRange).setPropertyValue("CellStyle", BIT_HEADING_STYLE);
       UnoRuntime.queryInterface(XMergeable.class, xCellRange).merge(true);
 
-      m_line = 16; /* first line to draw */
+      /* first line to draw */
+      m_line = 3;
 
       for(BdmFrame bdmFrame: bdmProtocol.frames)
       {
@@ -306,15 +310,8 @@ public class ProtocolLayoutGenerator
       /* Left cell of merge area */
       left = bitIndex;
       
-      /* Top cell of merge area (multi-line) */
-      if(bitIndex == 0)
-      {
-        top = byteIndex;
-      }
-      else
-      {
-        top = -1;
-      }
+      /* Top cell of merge area (complete line or multi-line) */
+      top = byteIndex;
 
       /* Fill bits */
       for(int i = 0; i < bdmField.m_size.getValue(); i++)
@@ -338,8 +335,9 @@ public class ProtocolLayoutGenerator
           {
             xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1 + left, m_line + byteIndex, m_column + 8, m_line + byteIndex);
             UnoRuntime.queryInterface(XMergeable.class, xCellRange).merge(true);
+            top++;
           }
-          /* End of multi-line merge area */
+          /* End of complete line or multi-line merge area */
           else if(bdmField.m_size.getValue() - i <= 8)
           {
             xCellRange = xSpreadsheet.getCellRangeByPosition(m_column + 1, m_line + top, m_column + 8, m_line + byteIndex);
