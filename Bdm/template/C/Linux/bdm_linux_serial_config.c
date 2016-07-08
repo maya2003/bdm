@@ -210,7 +210,7 @@ int Bdm_serialOpen(const char *deviceName, const Bdm_SerialConfiguration *config
   }
 
   /* stop bits */
-  if(configuration->stopBits > BDM_2_STOP_BITS)
+  if((configuration->stopBits < BDM_1_STOP_BIT) || (configuration->stopBits > BDM_2_STOP_BITS))
   {
     return -1;
   }

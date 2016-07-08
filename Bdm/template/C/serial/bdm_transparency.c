@@ -68,7 +68,7 @@ bool Bdm_transparencySendData(const Bdm_ProtocolContext *context, const u8 *data
  */
 bool Bdm_transparencyOctetReceived(Bdm_ProtocolContext *context, u8 octet)
 {
-  //Bdm_dump(&octet, sizeof(octet));
+  //Bdm_dumpMemory(&octet, sizeof(octet));
 
   switch(context->frameContext.transparencyContext.state)
   {
