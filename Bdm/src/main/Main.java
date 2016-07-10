@@ -69,7 +69,7 @@ public class Main
 
       System.out.println("Parsing data dictionary spreadsheet...");
       BdmDataDictionary bdmDataDictionary = new BdmDataDictionary();
-      bdmCell = new BdmCell(xSpreadsheet2, 3, 0);
+      bdmCell = new BdmCell(xSpreadsheet2, 9, 0);
       BdmDataDictionaryParser bdmDataDictionaryParser = new BdmDataDictionaryParser(bdmDataDictionary, bdmCell);
       bdmDataDictionaryParser.parse();
 
@@ -83,8 +83,6 @@ public class Main
       BdmDataDictionaryGenerator bdmDataDictionaryGenerator = new BdmDataDictionaryGenerator(bdmFileGenerator, bdmDataDictionary);
       bdmDataDictionaryGenerator.createHeaderFile();
       bdmDataDictionaryGenerator.createImplementationFile();
-
-      //dictionaryHeaderFile.close();
 
       System.out.println("Generating protocol layout...");
       ProtocolLayoutGenerator protocolLayoutGenerator = new ProtocolLayoutGenerator(xSpreadsheetDocument);

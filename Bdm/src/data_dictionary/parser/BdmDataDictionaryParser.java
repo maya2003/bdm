@@ -30,11 +30,10 @@ public class BdmDataDictionaryParser
     BdmData bdmData;
     BdmDataParser bdmDataParser;
 
-int i = 5;
+int i = 3;
 
-    m_bdmDataDictionary.setName(m_bdmCell.getCell(0, 14).getFormula());
-    m_bdmDataDictionary.setFilename("DD_NAME"); //TODO m_bdmCell.getCell(1, 0).getFormula());
-    m_bdmCell.getCell(-1, -14);
+    m_bdmDataDictionary.setName("bdm");        //TODO
+    m_bdmDataDictionary.setFilename("bdm_dd"); //TODO
 
     try
     {
